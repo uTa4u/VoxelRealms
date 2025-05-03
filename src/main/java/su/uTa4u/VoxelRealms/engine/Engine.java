@@ -1,7 +1,5 @@
 package su.uTa4u.VoxelRealms.engine;
 
-import static org.lwjgl.opengl.GL11.*;
-
 public final class Engine {
     private final Window window;
     private final Renderer renderer;
@@ -19,23 +17,22 @@ public final class Engine {
     }
 
     public void run() {
-        long start = System.currentTimeMillis();
-        long previous = start;
-        float msPerFrame = this.targetFps > 0 ? 1000.0f / this.targetFps : 0;
+        long previous = System.currentTimeMillis();
+        long secTimer = System.currentTimeMillis();
+        float msPerFrame = !this.isVsync ? 1000.0f / this.targetFps : 0;
+        float deltaFrame = 0;
+        int fps = 0;
         float msPerTick = 1000.0f / this.targetTps;
         float deltaTick = 0;
-        float deltaFrame = 0;
-        long tickTime = start;
-        int fps = 0;
         int tps = 0;
-        long timer = start;
 
-        while (!window.shouldClose()) {
-            window.pollEvents();
+        while (!this.window.shouldClose()) {
+            this.window.pollEvents();
 
             long current = System.currentTimeMillis();
-            deltaFrame += (current - previous) / msPerFrame;
-            deltaTick += (current - previous) / msPerTick;
+            long dt = current - previous;
+            deltaFrame += dt / msPerFrame;
+            deltaTick += dt / msPerTick;
             previous = current;
 
             if (this.isVsync || deltaFrame >= 1.0f) {
@@ -43,29 +40,27 @@ public final class Engine {
             }
 
             if (deltaTick >= 1.0f) {
-                long dt = current - tickTime;
                 // Handle tick
                 tps++;
                 deltaTick--;
-                tickTime = current;
             }
 
             if (this.isVsync || deltaFrame >= 1.0f) {
-                renderer.render();
+                this.renderer.render();
                 fps++;
                 deltaFrame--;
-                window.tick();
+                this.window.tick();
             }
 
-            if (current - timer > 1000) {
-                timer += 1000;
+            if (current - secTimer >= 1000L) {
+                secTimer += 1000L;
                 this.window.setTitle("FPS: " + fps + " TPS: " + tps);
                 tps = 0;
                 fps = 0;
             }
         }
 
-        window.cleanup();
+        this.window.cleanup();
     }
 
 }
