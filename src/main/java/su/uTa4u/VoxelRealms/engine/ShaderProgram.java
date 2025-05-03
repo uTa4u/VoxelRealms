@@ -22,7 +22,7 @@ public final class ShaderProgram {
 
         for (ShaderData shader : shaders) {
             int shaderId = glCreateShader(shader.type);
-            GL20.glShaderSource(shaderId, Utils.readFile(shader.path));
+            GL20.glShaderSource(shaderId, Utils.readFile("./shaders/" + shader.name));
             glCompileShader(shaderId);
             glGetShaderiv(shaderId, GL_COMPILE_STATUS, success);
             if (success.get(0) == 0) {
@@ -34,7 +34,6 @@ public final class ShaderProgram {
             if (success.get(0) == 0) {
                 System.err.println("Could not link program: " + glGetProgramInfoLog(this.id));
             }
-            glDetachShader(this.id, shaderId);
             glDeleteShader(shaderId);
         }
     }
@@ -54,6 +53,6 @@ public final class ShaderProgram {
         }
     }
 
-    record ShaderData(int type, String path) {
+    public record ShaderData(int type, String name) {
     }
 }

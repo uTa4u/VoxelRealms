@@ -1,7 +1,5 @@
 package su.uTa4u.VoxelRealms;
 
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.joml.Vector3i;
 
 public final class Face {

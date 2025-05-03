@@ -1,15 +1,13 @@
 package su.uTa4u.VoxelRealms.engine;
 
-import org.joml.Vector3i;
 import org.lwjgl.opengl.GL;
 
 import java.util.List;
 
-import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
 import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public final class Renderer {
     private final ShaderProgram shaderProg;
@@ -19,17 +17,27 @@ public final class Renderer {
         GL.createCapabilities();
 
         this.shaderProg = new ShaderProgram(List.of(
-                new ShaderProgram.ShaderData(GL_VERTEX_SHADER, "./shaders/basic.vert"),
-                new ShaderProgram.ShaderData(GL_FRAGMENT_SHADER, "./shaders/basic.frag")
+                new ShaderProgram.ShaderData(GL_VERTEX_SHADER, "basic.vert"),
+                new ShaderProgram.ShaderData(GL_FRAGMENT_SHADER, "basic.frag")
         ));
 
         float[] positions = new float[]{
-                0.0f, 0.5f, 0.0f,
+                -0.5f, 0.5f, 0.0f,
                 -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f
+                0.5f, -0.5f, 0.0f,
+                0.5f, 0.5f, 0.0f,
+        };
+        float[] colors = new float[]{
+                0.5f, 0.0f, 0.0f,
+                0.0f, 0.5f, 0.0f,
+                0.0f, 0.0f, 0.5f,
+                0.0f, 0.5f, 0.5f,
+        };
+        int[] indices = new int[]{
+                0, 1, 3, 3, 1, 2,
         };
 
-        this.mesh = new Mesh(positions, 3);
+        this.mesh = new Mesh(positions, colors, indices);
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     }
@@ -41,7 +49,7 @@ public final class Renderer {
 
         glBindVertexArray(this.mesh.getVaoId());
         this.shaderProg.validate();
-        glDrawArrays(GL_TRIANGLES, 0, this.mesh.getVertexCount());
+        glDrawElements(GL_TRIANGLES, this.mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         this.shaderProg.unbind();
