@@ -20,8 +20,11 @@ public final class ShaderProgram {
 
         IntBuffer success = MemoryUtil.memAllocInt(1);
 
-        for (ShaderData shader : shaders) {
+        int[] shaderIds = new int[shaders.size()];
+        for (int i = 0; i < shaders.size(); i++) {
+            ShaderData shader = shaders.get(i);
             int shaderId = glCreateShader(shader.type);
+            shaderIds[i] = shaderId;
             GL20.glShaderSource(shaderId, Utils.readFile("./shaders/" + shader.name));
             glCompileShader(shaderId);
             glGetShaderiv(shaderId, GL_COMPILE_STATUS, success);
@@ -29,13 +32,20 @@ public final class ShaderProgram {
                 System.err.println("Could not compile shader: " + glGetShaderInfoLog(shaderId));
             }
             glAttachShader(this.id, shaderId);
-            glLinkProgram(this.id);
-            glGetProgramiv(this.id, GL_LINK_STATUS, success);
-            if (success.get(0) == 0) {
-                System.err.println("Could not link program: " + glGetProgramInfoLog(this.id));
-            }
+        }
+
+        glLinkProgram(this.id);
+        glGetProgramiv(this.id, GL_LINK_STATUS, success);
+        if (success.get(0) == 0) {
+            System.err.println("Could not link program: " + glGetProgramInfoLog(this.id));
+        }
+
+        for (int shaderId : shaderIds) {
+            glDetachShader(this.id, shaderId);
             glDeleteShader(shaderId);
         }
+
+        MemoryUtil.memFree(success);
     }
 
     public void bind() {
