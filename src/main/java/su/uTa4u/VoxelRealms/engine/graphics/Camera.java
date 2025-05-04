@@ -1,14 +1,16 @@
-package su.uTa4u.VoxelRealms.engine;
+package su.uTa4u.VoxelRealms.engine.graphics;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import su.uTa4u.VoxelRealms.engine.Window;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 public final class Camera {
-    private static final float MOVEMENT_SPEED = 5.0f;
-    private static final float MOUSE_SENSITIVITY = 0.1f;
+    private static final float PITCH_CONSTRAINT = (float) Math.toRadians(89.0f);
+    private static final float MOVEMENT_SPEED = 10.0f;
+    private static final float MOUSE_SENSITIVITY = 0.001f;
 
     private final Vector3f up;
     private final Vector3f right;
@@ -66,6 +68,8 @@ public final class Camera {
 
     public void addRotation(float x, float y) {
         this.rotation.add(x, y);
+        if (this.rotation.x > PITCH_CONSTRAINT) this.rotation.x = PITCH_CONSTRAINT;
+        if (this.rotation.x < -PITCH_CONSTRAINT) this.rotation.x = -PITCH_CONSTRAINT;
         this.recalculate();
     }
 
@@ -99,11 +103,11 @@ public final class Camera {
             this.moveDown(dist);
         }
 
-        MouseInput mouseInput = window.getMouseInput();
-        if (mouseInput.isRightButtonPressed()) {
-            Vector2f delta = mouseInput.getDelta();
-            this.addRotation((float) Math.toRadians(-delta.x * MOUSE_SENSITIVITY),
-                    (float) Math.toRadians(-delta.y * MOUSE_SENSITIVITY));
-        }
+        Vector2f delta = window.getMouseInput().getDelta();
+        this.addRotation(
+                delta.x * MOUSE_SENSITIVITY,
+                delta.y * MOUSE_SENSITIVITY
+        );
+        delta.set(0.0f);
     }
 }

@@ -5,6 +5,7 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLDebugMessageCallbackI;
+import su.uTa4u.VoxelRealms.engine.graphics.MouseInput;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -44,7 +45,7 @@ public final class Window {
 
         GL.createCapabilities();
 
-        // glDebugMessageCallback((GLDebugMessageCallbackI) setupDebugMessageCallback(), NULL);
+        glDebugMessageCallback((GLDebugMessageCallbackI) setupDebugMessageCallback(), NULL);
 
         GLFWErrorCallback.createPrint(System.err).set();
 
@@ -68,9 +69,14 @@ public final class Window {
                 (vidmode.height() - this.height) / 2
         );
 
-        glfwShowWindow(this.handle);
+        glfwSetInputMode(this.handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        if (glfwRawMouseMotionSupported()) {
+            glfwSetInputMode(this.handle, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+        }
 
         this.mouseInput = new MouseInput(this.handle);
+
+        glfwShowWindow(this.handle);
     }
 
     public MouseInput getMouseInput() {
@@ -113,6 +119,18 @@ public final class Window {
         this.width = width;
         this.height = height;
     }
+
+//    public void toggleCursor() {
+//        if (this.isCursorDisabled) {
+//            glfwSetInputMode(this.handle, GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
+//        } else {
+//            glfwSetInputMode(this.handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+//            if (glfwRawMouseMotionSupported()) {
+//                glfwSetInputMode(this.handle, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+//            }
+//        }
+//        this.isCursorDisabled = !this.isCursorDisabled;
+//    }
 
     public void cleanup() {
         glfwFreeCallbacks(this.handle);

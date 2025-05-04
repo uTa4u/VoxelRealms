@@ -1,6 +1,8 @@
 package su.uTa4u.VoxelRealms;
 
 import su.uTa4u.VoxelRealms.engine.Engine;
+import su.uTa4u.VoxelRealms.engine.mesh.NaiveMesher;
+import su.uTa4u.VoxelRealms.world.World;
 
 public final class Main {
     private static final String TITLE = "Voxel Realms";
@@ -11,6 +13,11 @@ public final class Main {
 
     public static void main(String[] args) {
         Engine engine = new Engine(TITLE, DEFAULT_WIDTH, DEFAULT_HEIGHT, TARGET_FPS, TARGET_TPS);
+
+        World world = new World();
+        NaiveMesher mesher = new NaiveMesher();
+        engine.getRenderer().addMeshes(mesher.createMeshForWorld(world));
+
         engine.run();
     }
 }

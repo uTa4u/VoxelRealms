@@ -21,7 +21,7 @@ public final class World {
 //            }
 //        }
         voxels[0][0][0] = new Voxel(0, 0, -10, 0.0f, 1.0f, 0.0f);
-//        voxels[0][0][1] = new Voxel(0, 1, -2, 1.0f, 0.0f, 0.0f);
-//        voxels[0][0][2] = new Voxel(1, 0, -2, 0.0f, 0.0f, 1.0f);
+        voxels[0][0][1] = new Voxel(0, 1, -5, 1.0f, 0.0f, 0.0f);
+        voxels[0][0][2] = new Voxel(1, 0, -2, 0.0f, 0.0f, 1.0f);
     }
 }

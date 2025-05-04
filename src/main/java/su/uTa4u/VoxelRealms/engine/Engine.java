@@ -1,5 +1,9 @@
 package su.uTa4u.VoxelRealms.engine;
 
+import su.uTa4u.VoxelRealms.engine.graphics.Renderer;
+
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_F1;
+
 public final class Engine {
     private final Window window;
     private final Renderer renderer;
@@ -38,7 +42,6 @@ public final class Engine {
             if (this.isVsync || deltaFrame >= 1.0f) {
                 // Handle input
                 this.renderer.camera.handleWindowInput(this.window, dt / 1000.0f);
-                this.window.getMouseInput().input();
             }
 
             if (deltaTick >= 1.0f) {
@@ -68,6 +71,10 @@ public final class Engine {
     void resize(int width, int height) {
         this.window.setSize(width, height);
         this.renderer.projection.update(width, height);
+    }
+
+    public Renderer getRenderer() {
+        return this.renderer;
     }
 
 }

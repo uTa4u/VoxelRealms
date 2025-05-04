@@ -48,25 +48,15 @@ public final class NaiveMesher {
                         v.x + 1, v.y + 1, v.z + 1
                 },
                 new float[]{
-                        0.5f, 0.0f, 0.0f,
-                        0.0f, 0.5f, 0.0f,
-                        0.0f, 0.0f, 0.5f,
-                        0.0f, 0.5f, 0.5f,
-                        0.5f, 0.0f, 0.0f,
-                        0.0f, 0.5f, 0.0f,
-                        0.0f, 0.0f, 0.5f,
-                        0.0f, 0.5f, 0.5f,
+                        v.r, v.g, v.b,
+                        v.r, v.g, v.b,
+                        v.r, v.g, v.b,
+                        v.r, v.g, v.b,
+                        v.r, v.g, v.b,
+                        v.r, v.g, v.b,
+                        v.r, v.g, v.b,
+                        v.r, v.g, v.b,
                 },
-//                new float[]{
-//                        v.r, v.g, v.b,
-//                        v.r, v.g, v.b,
-//                        v.r, v.g, v.b,
-//                        v.r, v.g, v.b,
-//                        v.r, v.g, v.b,
-//                        v.r, v.g, v.b,
-//                        v.r, v.g, v.b,
-//                        v.r, v.g, v.b,
-//                },
                 new int[]{
                         0, 2, 4, 4, 2, 6, // +Z face
                         1, 3, 5, 5, 3, 7, // -Z face

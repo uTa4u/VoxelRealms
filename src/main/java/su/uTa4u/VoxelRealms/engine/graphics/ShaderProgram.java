@@ -1,4 +1,4 @@
-package su.uTa4u.VoxelRealms.engine;
+package su.uTa4u.VoxelRealms.engine.graphics;
 
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL20;

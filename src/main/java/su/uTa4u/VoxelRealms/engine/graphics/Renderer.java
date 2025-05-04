@@ -1,7 +1,7 @@
-package su.uTa4u.VoxelRealms.engine;
+package su.uTa4u.VoxelRealms.engine.graphics;
 
 import org.lwjgl.opengl.GL;
-import su.uTa4u.VoxelRealms.Projection;
+import su.uTa4u.VoxelRealms.engine.Window;
 import su.uTa4u.VoxelRealms.engine.mesh.Mesh;
 import su.uTa4u.VoxelRealms.engine.mesh.NaiveMesher;
 import su.uTa4u.VoxelRealms.world.World;
@@ -21,7 +21,7 @@ public final class Renderer {
     public final Projection projection;
     public final Camera camera;
 
-    Renderer(Window window) {
+    public Renderer(Window window) {
         GL.createCapabilities();
 
         glEnable(GL_DEPTH_TEST);
@@ -31,11 +31,7 @@ public final class Renderer {
                 new ShaderProgram.ShaderData(GL_FRAGMENT_SHADER, "basic.frag")
         ));
 
-        // TODO: move this out into World
-        World world = new World();
-        NaiveMesher mesher = new NaiveMesher();
         this.meshes = new ArrayList<>();
-        this.meshes.addAll(mesher.createMeshForWorld(world));
 
         this.camera = new Camera();
         this.shaderProg.createUniform("viewMatrix");
@@ -62,5 +58,9 @@ public final class Renderer {
         glBindVertexArray(0);
 
         this.shaderProg.unbind();
+    }
+
+    public void addMeshes(List<Mesh> meshes) {
+        this.meshes.addAll(meshes);
     }
 }
