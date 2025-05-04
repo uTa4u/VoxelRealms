@@ -1,4 +1,4 @@
-package su.uTa4u.VoxelRealms;
+package su.uTa4u.VoxelRealms.world;
 
 public final class World {
     public static final int SIZE = 256;

@@ -1,4 +1,4 @@
-package su.uTa4u.VoxelRealms;
+package su.uTa4u.VoxelRealms.util;
 
 import java.io.IOException;
 import java.io.InputStream;

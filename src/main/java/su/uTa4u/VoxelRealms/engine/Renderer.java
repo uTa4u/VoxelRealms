@@ -1,6 +1,7 @@
 package su.uTa4u.VoxelRealms.engine;
 
 import org.lwjgl.opengl.GL;
+import su.uTa4u.VoxelRealms.engine.mesh.Mesh;
 
 import java.util.List;
 

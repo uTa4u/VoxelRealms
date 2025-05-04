@@ -1,9 +1,9 @@
-package su.uTa4u.VoxelRealms;
+package su.uTa4u.VoxelRealms.world;
 
 public final class Chunk {
     public static final int SIZE = 32;
 
-    public final Block[][][] blocks = new Block[SIZE][SIZE][SIZE];
+    public final Voxel[][][] blocks = new Voxel[SIZE][SIZE][SIZE];
 
     private final int chunkX;
     private final int chunkY;
@@ -16,7 +16,7 @@ public final class Chunk {
         for (int y = 0; y < SIZE; ++y) {
             for (int x = 0; x < SIZE; ++x) {
                 for (int z = 0; z < SIZE; ++z) {
-                    blocks[y][x][z] = new Block(x, y, z,255, 0, 0);
+                    blocks[y][x][z] = new Voxel(x, y, z,255, 0, 0);
                 }
             }
         }

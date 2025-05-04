@@ -1,10 +1,8 @@
 package su.uTa4u.VoxelRealms.engine;
 
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.system.MemoryUtil;
-import su.uTa4u.VoxelRealms.Utils;
+import su.uTa4u.VoxelRealms.util.Utils;
 
-import java.nio.IntBuffer;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL20.*;
@@ -18,8 +16,6 @@ public final class ShaderProgram {
             throw new RuntimeException("Could not create GL Program");
         }
 
-        IntBuffer success = MemoryUtil.memAllocInt(1);
-
         int[] shaderIds = new int[shaders.size()];
         for (int i = 0; i < shaders.size(); i++) {
             ShaderData shader = shaders.get(i);
@@ -27,16 +23,14 @@ public final class ShaderProgram {
             shaderIds[i] = shaderId;
             GL20.glShaderSource(shaderId, Utils.readFile("./shaders/" + shader.name));
             glCompileShader(shaderId);
-            glGetShaderiv(shaderId, GL_COMPILE_STATUS, success);
-            if (success.get(0) == 0) {
+            if (glGetShaderi(shaderId, GL_COMPILE_STATUS) == 0) {
                 System.err.println("Could not compile shader: " + glGetShaderInfoLog(shaderId));
             }
             glAttachShader(this.id, shaderId);
         }
 
         glLinkProgram(this.id);
-        glGetProgramiv(this.id, GL_LINK_STATUS, success);
-        if (success.get(0) == 0) {
+        if (glGetProgrami(this.id, GL_LINK_STATUS) == 0) {
             System.err.println("Could not link program: " + glGetProgramInfoLog(this.id));
         }
 
@@ -44,8 +38,6 @@ public final class ShaderProgram {
             glDetachShader(this.id, shaderId);
             glDeleteShader(shaderId);
         }
-
-        MemoryUtil.memFree(success);
     }
 
     public void bind() {

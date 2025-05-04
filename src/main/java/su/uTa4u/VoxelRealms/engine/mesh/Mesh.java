@@ -1,4 +1,4 @@
-package su.uTa4u.VoxelRealms.engine;
+package su.uTa4u.VoxelRealms.engine.mesh;
 
 import static org.lwjgl.opengl.GL30.*;
 
@@ -6,7 +6,7 @@ public final class Mesh {
     private final int vertexCount;
     private final int vaoId;
 
-    Mesh(float[] positions, float[] colors, int[] indices) {
+    public Mesh(float[] positions, float[] colors, int[] indices) {
         this.vertexCount = indices.length;
 
         this.vaoId = glGenVertexArrays();
