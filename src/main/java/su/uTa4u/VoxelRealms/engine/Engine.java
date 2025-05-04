@@ -10,8 +10,8 @@ public final class Engine {
 
     public Engine(String title, int initWidth, int initHeight, int targetFps, int targetTps) {
         this.isVsync = targetFps <= 0;
-        this.window = new Window(title, initWidth, initHeight, this.isVsync);
-        this.renderer = new Renderer();
+        this.window = new Window(this, title, initWidth, initHeight, this.isVsync);
+        this.renderer = new Renderer(this.window);
         this.targetFps = targetFps;
         this.targetTps = targetTps;
     }
@@ -61,6 +61,11 @@ public final class Engine {
         }
 
         this.window.cleanup();
+    }
+
+    void resize(int width, int height) {
+        this.window.setSize(width, height);
+        this.renderer.projection.update(width, height);
     }
 
 }

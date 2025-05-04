@@ -14,12 +14,10 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public final class Window {
     private final long handle;
-    private final int glVerMajor;
-    private final int glVerMinor;
     private int width;
     private int height;
 
-    Window(String title, int initWidth, int initHeight, boolean isVsync) {
+    Window(Engine engine, String title, int initWidth, int initHeight, boolean isVsync) {
         if (!glfwInit()) throw new RuntimeException("Failed to initialize GLFW");
 
         glfwDefaultWindowHints();
@@ -34,14 +32,13 @@ public final class Window {
                 NULL
         );
         if (this.handle == NULL) throw new RuntimeException("Failed to create the GLFW window");
-        this.width = initWidth;
-        this.height = initHeight;
+        this.setSize(initWidth, initHeight);
 
-        this.glVerMajor = glfwGetWindowAttrib(handle, GLFW_CONTEXT_VERSION_MAJOR);
-        this.glVerMinor = glfwGetWindowAttrib(handle, GLFW_CONTEXT_VERSION_MINOR);
-        System.out.println("[INFO] OpenGL Version " + this.glVerMajor + "." + this.glVerMinor);
+        int glVerMajor = glfwGetWindowAttrib(this.handle, GLFW_CONTEXT_VERSION_MAJOR);
+        int glVerMinor = glfwGetWindowAttrib(this.handle, GLFW_CONTEXT_VERSION_MINOR);
+        System.out.println("[INFO] OpenGL Version " + glVerMajor + "." + glVerMinor);
 
-        glfwMakeContextCurrent(handle);
+        glfwMakeContextCurrent(this.handle);
 
         GL.createCapabilities();
 
@@ -49,7 +46,9 @@ public final class Window {
 
         GLFWErrorCallback.createPrint(System.err).set();
 
-        glfwSetKeyCallback(handle, (window, key, scancode, action, mods) -> {
+        glfwSetFramebufferSizeCallback(this.handle, (window, width, height) -> engine.resize(width, height));
+
+        glfwSetKeyCallback(this.handle, (window, key, scancode, action, mods) -> {
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) glfwSetWindowShouldClose(window, true);
         });
 
@@ -62,12 +61,12 @@ public final class Window {
         GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         if (vidmode == null) throw new RuntimeException("Failed to get GLFW VideoMode");
         glfwSetWindowPos(
-                handle,
-                (vidmode.width() - width) / 2,
-                (vidmode.height() - height) / 2
+                this.handle,
+                (vidmode.width() - this.width) / 2,
+                (vidmode.height() - this.height) / 2
         );
 
-        glfwShowWindow(handle);
+        glfwShowWindow(this.handle);
     }
 
     public long getHandle() {
@@ -100,6 +99,11 @@ public final class Window {
 
     public void setTitle(String title) {
         GLFW.glfwSetWindowTitle(this.handle, title);
+    }
+
+    public void setSize(int width, int height) {
+        this.width = width;
+        this.height = height;
     }
 
     public void cleanup() {

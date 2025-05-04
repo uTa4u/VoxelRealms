@@ -1,6 +1,7 @@
 package su.uTa4u.VoxelRealms.engine;
 
 import org.lwjgl.opengl.GL;
+import su.uTa4u.VoxelRealms.Projection;
 import su.uTa4u.VoxelRealms.engine.mesh.Mesh;
 
 import java.util.List;
@@ -14,7 +15,9 @@ public final class Renderer {
     private final ShaderProgram shaderProg;
     private final Mesh mesh;
 
-    Renderer() {
+    public final Projection projection;
+
+    Renderer(Window window) {
         GL.createCapabilities();
 
         this.shaderProg = new ShaderProgram(List.of(
@@ -23,10 +26,10 @@ public final class Renderer {
         ));
 
         float[] positions = new float[]{
-                -0.5f, 0.5f, 0.0f,
-                -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-                0.5f, 0.5f, 0.0f,
+                -0.5f, 0.5f, -1.0f,
+                -0.5f, -0.5f, -1.0f,
+                0.5f, -0.5f, -1.0f,
+                0.5f, 0.5f, -1.0f,
         };
         float[] colors = new float[]{
                 0.5f, 0.0f, 0.0f,
@@ -40,6 +43,9 @@ public final class Renderer {
 
         this.mesh = new Mesh(positions, colors, indices);
 
+        this.projection = new Projection(window.getWidth(), window.getHeight());
+        this.shaderProg.createUniform("projectionMatrix");
+
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
@@ -48,6 +54,8 @@ public final class Renderer {
 
         this.shaderProg.bind();
 
+        this.shaderProg.setUniform("projectionMatrix", this.projection.getMatrix());
+
         glBindVertexArray(this.mesh.getVaoId());
         this.shaderProg.validate();
         glDrawElements(GL_TRIANGLES, this.mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
@@ -55,28 +63,4 @@ public final class Renderer {
 
         this.shaderProg.unbind();
     }
-
-//    public void drawTriangle(Vector3i a, Vector3i b, Vector3i c) {
-//        int[] vertices = new int[9];
-//        vertices[0] = a.x;
-//        vertices[1] = a.y;
-//        vertices[2] = a.z;
-//        vertices[3] = b.x;
-//        vertices[4] = b.y;
-//        vertices[5] = b.z;
-//        vertices[6] = c.x;
-//        vertices[7] = c.y;
-//        vertices[8] = c.z;
-//
-//        glUseProgram(shaderProg);
-//        glBindVertexArray(vao);
-//        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-//        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
-//        glDrawArrays(GL_TRIANGLES, 0, 3);
-//    }
-//
-//    public void drawSquare(Vector3i a, Vector3i b, Vector3i c, Vector3i d) {
-//        drawTriangle(a, b, c);
-//        drawTriangle(a, d, c);
-//    }
 }

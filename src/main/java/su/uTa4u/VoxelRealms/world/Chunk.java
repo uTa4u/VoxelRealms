@@ -13,10 +13,10 @@ public final class Chunk {
         this.chunkX = i * SIZE;
         this.chunkY = j * SIZE;
         this.chunkZ = k * SIZE;
-        for (int y = 0; y < SIZE; ++y) {
-            for (int x = 0; x < SIZE; ++x) {
+        for (int x = 0; x < SIZE; ++x) {
+            for (int y = 0; y < SIZE; ++y) {
                 for (int z = 0; z < SIZE; ++z) {
-                    blocks[y][x][z] = new Voxel(x, y, z,255, 0, 0);
+                    blocks[x][y][z] = new Voxel(x, y, z,255, 0, 0);
                 }
             }
         }
