@@ -26,7 +26,7 @@ public final class ShaderProgram {
             ShaderData shader = shaders.get(i);
             int shaderId = glCreateShader(shader.type);
             shaderIds[i] = shaderId;
-            GL20.glShaderSource(shaderId, Utils.readFile("./shaders/" + shader.name));
+            GL20.glShaderSource(shaderId, Utils.readFile("shaders/" + shader.name));
             glCompileShader(shaderId);
             if (glGetShaderi(shaderId, GL_COMPILE_STATUS) == 0) {
                 System.err.println("Could not compile shader: " + glGetShaderInfoLog(shaderId));

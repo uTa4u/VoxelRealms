@@ -6,7 +6,7 @@ public final class Mesh {
     private final int vertexCount;
     private final int vaoId;
 
-    public Mesh(float[] positions, float[] colors, int[] indices) {
+    public Mesh(int[] positions, float[] colors, int[] indices) {
         this.vertexCount = indices.length;
 
         this.vaoId = glGenVertexArrays();
@@ -18,7 +18,7 @@ public final class Mesh {
         glBindBuffer(GL_ARRAY_BUFFER, vboId);
         glBufferData(GL_ARRAY_BUFFER, positions, GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+        glVertexAttribPointer(0, 3, GL_INT, false, 0, 0);
 
         // Color
         vboId = glGenBuffers();

@@ -1,25 +1,24 @@
 package su.uTa4u.VoxelRealms.world;
 
 import org.joml.Vector3i;
+import su.uTa4u.VoxelRealms.engine.mesh.Mesh;
 
 public final class Voxel {
     public final int x;
     public final int y;
     public final int z;
-    public final Vector3i v;
 
-    public final byte r;
-    public final byte g;
-    public final byte b;
+    public final float r;
+    public final float g;
+    public final float b;
 
-    public Voxel(int x, int y, int z, int r, int g, int b) {
+    public Voxel(int x, int y, int z, float r, float g, float b) {
         this.x = x;
         this.y = y;
         this.z = z;
-        this.v = new Vector3i(this.x, this.y, this.z);
 
-        this.r = (byte) r;
-        this.g = (byte) g;
-        this.b = (byte) b;
+        this.r = r;
+        this.g = g;
+        this.b = b;
     }
 }

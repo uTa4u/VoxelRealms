@@ -2,7 +2,7 @@ package su.uTa4u.VoxelRealms;
 
 import su.uTa4u.VoxelRealms.engine.Engine;
 
-public class Main {
+public final class Main {
     private static final String TITLE = "Voxel Realms";
     private static final int DEFAULT_WIDTH = 800;
     private static final int DEFAULT_HEIGHT = 600;

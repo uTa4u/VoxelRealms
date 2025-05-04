@@ -4,6 +4,14 @@ plugins {
     id 'idea'
 }
 
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'su.uTa4u.VoxelRealms.Main'
+        )
+    }
+}
+
 application {
     mainClass = "${group}.${title}.Main"
 }

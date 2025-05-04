@@ -37,6 +37,8 @@ public final class Engine {
 
             if (this.isVsync || deltaFrame >= 1.0f) {
                 // Handle input
+                this.renderer.camera.handleWindowInput(this.window, dt / 1000.0f);
+                this.window.getMouseInput().input();
             }
 
             if (deltaTick >= 1.0f) {

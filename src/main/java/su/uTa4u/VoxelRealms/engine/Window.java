@@ -13,6 +13,8 @@ import static org.lwjgl.opengl.GLUtil.setupDebugMessageCallback;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public final class Window {
+    private final MouseInput mouseInput;
+
     private final long handle;
     private int width;
     private int height;
@@ -42,7 +44,7 @@ public final class Window {
 
         GL.createCapabilities();
 
-        glDebugMessageCallback((GLDebugMessageCallbackI) setupDebugMessageCallback(), NULL);
+        // glDebugMessageCallback((GLDebugMessageCallbackI) setupDebugMessageCallback(), NULL);
 
         GLFWErrorCallback.createPrint(System.err).set();
 
@@ -67,6 +69,12 @@ public final class Window {
         );
 
         glfwShowWindow(this.handle);
+
+        this.mouseInput = new MouseInput(this.handle);
+    }
+
+    public MouseInput getMouseInput() {
+        return this.mouseInput;
     }
 
     public long getHandle() {
