@@ -5,7 +5,10 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLDebugMessageCallbackI;
+import org.lwjgl.system.MemoryStack;
 import su.uTa4u.VoxelRealms.engine.graphics.MouseInput;
+
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -19,6 +22,8 @@ public final class Window {
     private final long handle;
     private int width;
     private int height;
+    private final float scaleX;
+    private final float scaleY;
 
     Window(Engine engine, String title, int initWidth, int initHeight, boolean isVsync) {
         if (!glfwInit()) throw new RuntimeException("Failed to initialize GLFW");
@@ -45,7 +50,7 @@ public final class Window {
 
         GL.createCapabilities();
 
-        glDebugMessageCallback((GLDebugMessageCallbackI) setupDebugMessageCallback(), NULL);
+//        glDebugMessageCallback((GLDebugMessageCallbackI) setupDebugMessageCallback(), NULL);
 
         GLFWErrorCallback.createPrint(System.err).set();
 
@@ -61,13 +66,22 @@ public final class Window {
             glfwSwapInterval(0);
         }
 
-        GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        long monitor = glfwGetPrimaryMonitor();
+        GLFWVidMode vidmode = glfwGetVideoMode(monitor);
         if (vidmode == null) throw new RuntimeException("Failed to get GLFW VideoMode");
         glfwSetWindowPos(
                 this.handle,
                 (vidmode.width() - this.width) / 2,
                 (vidmode.height() - this.height) / 2
         );
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            FloatBuffer sx = stack.mallocFloat(1);
+            FloatBuffer sy = stack.mallocFloat(1);
+            glfwGetMonitorContentScale(monitor, sx, sy);
+            this.scaleX = sx.get(0);
+            this.scaleY = sy.get(0);
+        }
 
         glfwSetInputMode(this.handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         if (glfwRawMouseMotionSupported()) {
@@ -95,6 +109,14 @@ public final class Window {
         return this.height;
     }
 
+    public float getScaleX() {
+        return this.scaleX;
+    }
+
+    public float getScaleY() {
+        return this.scaleY;
+    }
+
     public boolean shouldClose() {
         return glfwWindowShouldClose(this.handle);
     }
@@ -119,18 +141,6 @@ public final class Window {
         this.width = width;
         this.height = height;
     }
-
-//    public void toggleCursor() {
-//        if (this.isCursorDisabled) {
-//            glfwSetInputMode(this.handle, GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
-//        } else {
-//            glfwSetInputMode(this.handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-//            if (glfwRawMouseMotionSupported()) {
-//                glfwSetInputMode(this.handle, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-//            }
-//        }
-//        this.isCursorDisabled = !this.isCursorDisabled;
-//    }
 
     public void cleanup() {
         glfwFreeCallbacks(this.handle);

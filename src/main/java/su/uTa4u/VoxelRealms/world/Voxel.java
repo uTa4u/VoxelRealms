@@ -8,17 +8,12 @@ public final class Voxel {
     public final int y;
     public final int z;
 
-    public final float r;
-    public final float g;
-    public final float b;
+    public final VoxelMaterial material;
 
-    public Voxel(int x, int y, int z, float r, float g, float b) {
+    public Voxel(int x, int y, int z, VoxelMaterial material) {
         this.x = x;
         this.y = y;
         this.z = z;
-
-        this.r = r;
-        this.g = g;
-        this.b = b;
+        this.material = material;
     }
 }

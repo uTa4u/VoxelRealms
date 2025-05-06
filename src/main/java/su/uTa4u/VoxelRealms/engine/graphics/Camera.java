@@ -10,7 +10,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public final class Camera {
     private static final float PITCH_CONSTRAINT = (float) Math.toRadians(89.0f);
     private static final float MOVEMENT_SPEED = 10.0f;
-    private static final float MOUSE_SENSITIVITY = 0.001f;
+    private static final float MOUSE_SENSITIVITY = 0.005f;
 
     private final Vector3f up;
     private final Vector3f right;

@@ -44,3 +44,4 @@ bin/
 ### Custom ###
 /lib/
 renderdocdebug.cap
+/.idea

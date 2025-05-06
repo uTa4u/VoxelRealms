@@ -1,12 +1,12 @@
 package su.uTa4u.VoxelRealms.engine;
 
 import su.uTa4u.VoxelRealms.engine.graphics.Renderer;
-
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_F1;
+import su.uTa4u.VoxelRealms.engine.graphics.text.TextRenderer;
 
 public final class Engine {
     private final Window window;
     private final Renderer renderer;
+    private final TextRenderer textRenderer;
 
     private final boolean isVsync;
     private final int targetFps;
@@ -16,6 +16,7 @@ public final class Engine {
         this.isVsync = targetFps <= 0;
         this.window = new Window(this, title, initWidth, initHeight, this.isVsync);
         this.renderer = new Renderer(this.window);
+        this.textRenderer = new TextRenderer(this.window);
         this.targetFps = targetFps;
         this.targetTps = targetTps;
     }
@@ -52,6 +53,8 @@ public final class Engine {
 
             if (this.isVsync || deltaFrame >= 1.0f) {
                 this.renderer.render();
+                this.textRenderer.renderText("Hello, World", 0, 0);
+
                 fps++;
                 deltaFrame--;
                 this.window.tick();
@@ -59,7 +62,8 @@ public final class Engine {
 
             if (current - secTimer >= 1000L) {
                 secTimer += 1000L;
-                this.window.setTitle("FPS: " + fps + " TPS: " + tps);
+//                this.window.setTitle("FPS: " + fps + " TPS: " + tps);
+//                this.textRenderer.renderText("FPS: " + fps, 100, 100);
                 tps = 0;
                 fps = 0;
             }

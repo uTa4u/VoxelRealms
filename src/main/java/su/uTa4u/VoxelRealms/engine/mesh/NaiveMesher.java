@@ -5,7 +5,6 @@ import su.uTa4u.VoxelRealms.world.Voxel;
 import su.uTa4u.VoxelRealms.world.World;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public final class NaiveMesher {
@@ -14,23 +13,22 @@ public final class NaiveMesher {
 
     public List<Mesh> createMeshForWorld(World world) {
         List<Mesh> meshes = new ArrayList<>();
-//        for (int cy = 0; cy < SIZE; cy++) {
-//            for (int cx = 0; cx < SIZE; cx++) {
-//                for (int cz = 0; cz < SIZE; cz++) {
-//                    Chunk chunk = this.chunks[cy][cx][cz];
-//                    if (chunk == null) continue;
-        for (int y = 0; y < World.SIZE; ++y) {
-            for (int x = 0; x < World.SIZE; ++x) {
-                for (int z = 0; z < World.SIZE; ++z) {
-//                                Voxel voxel = chunk.voxels[y][x][z];
-                    Voxel voxel = world.voxels[y][x][z];
-                    if (voxel == null) continue;
-                    meshes.add(this.createMeshForVoxel(voxel));
+        for (int cy = 0; cy < World.SIZE; cy++) {
+            for (int cx = 0; cx < World.SIZE; cx++) {
+                for (int cz = 0; cz < World.SIZE; cz++) {
+                    Chunk chunk = world.chunks[cy][cx][cz];
+                    if (chunk == null) continue;
+                    for (int y = 0; y < Chunk.SIZE; ++y) {
+                        for (int x = 0; x < Chunk.SIZE; ++x) {
+                            for (int z = 0; z < Chunk.SIZE; ++z) {
+                                Voxel voxel = chunk.voxels[y][x][z];
+                                if (voxel == null) continue;
+                                meshes.add(this.createMeshForVoxel(voxel));
+                            }
+                        }
+                    }
                 }
             }
-//                    }
-//                }
-//            }
         }
         return meshes;
     }
@@ -48,14 +46,14 @@ public final class NaiveMesher {
                         v.x + 1, v.y + 1, v.z + 1
                 },
                 new float[]{
-                        v.r, v.g, v.b,
-                        v.r, v.g, v.b,
-                        v.r, v.g, v.b,
-                        v.r, v.g, v.b,
-                        v.r, v.g, v.b,
-                        v.r, v.g, v.b,
-                        v.r, v.g, v.b,
-                        v.r, v.g, v.b,
+                        v.material.r, v.material.g, v.material.b,
+                        v.material.r, v.material.g, v.material.b,
+                        v.material.r, v.material.g, v.material.b,
+                        v.material.r, v.material.g, v.material.b,
+                        v.material.r, v.material.g, v.material.b,
+                        v.material.r, v.material.g, v.material.b,
+                        v.material.r, v.material.g, v.material.b,
+                        v.material.r, v.material.g, v.material.b,
                 },
                 new int[]{
                         0, 2, 4, 4, 2, 6, // +Z face
