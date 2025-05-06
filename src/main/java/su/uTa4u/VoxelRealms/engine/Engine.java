@@ -27,9 +27,11 @@ public final class Engine {
         float msPerFrame = !this.isVsync ? 1000.0f / this.targetFps : 0;
         float deltaFrame = 0;
         int fps = 0;
+        int renderFps = 0;
         float msPerTick = 1000.0f / this.targetTps;
         float deltaTick = 0;
         int tps = 0;
+        int renderTps = 0;
 
         while (!this.window.shouldClose()) {
             this.window.pollEvents();
@@ -53,7 +55,8 @@ public final class Engine {
 
             if (this.isVsync || deltaFrame >= 1.0f) {
                 this.renderer.render();
-                this.textRenderer.renderText("Hello, World", 0, 0);
+
+                this.textRenderer.renderText("FPS: " + renderFps + "\nTPS: " + renderTps, 10, this.window.getHeight() - 10, 1.0f, 1.0f, 1.0f, 1f);
 
                 fps++;
                 deltaFrame--;
@@ -62,8 +65,8 @@ public final class Engine {
 
             if (current - secTimer >= 1000L) {
                 secTimer += 1000L;
-//                this.window.setTitle("FPS: " + fps + " TPS: " + tps);
-//                this.textRenderer.renderText("FPS: " + fps, 100, 100);
+                renderTps = tps;
+                renderFps = fps;
                 tps = 0;
                 fps = 0;
             }

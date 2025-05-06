@@ -51,7 +51,7 @@ public final class Renderer {
         for (Mesh mesh : this.meshes) {
             glBindVertexArray(mesh.getVaoId());
             this.shaderProgram.validate();
-//            glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
         }
         glBindVertexArray(0);
 

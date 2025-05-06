@@ -1,24 +1,18 @@
 package su.uTa4u.VoxelRealms.engine.graphics.text;
 
 import org.lwjgl.system.MemoryStack;
+import su.uTa4u.VoxelRealms.engine.Window;
 import su.uTa4u.VoxelRealms.engine.graphics.ShaderProgram;
 import su.uTa4u.VoxelRealms.util.Utils;
-import su.uTa4u.VoxelRealms.engine.Window;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
@@ -38,8 +32,8 @@ public final class TextRenderer {
     public TextRenderer(Window window) {
         this.glyphs = new HashMap<>();
         this.window = window;
-        Font font = Utils.readFont("Minecraft.otf");
-        font = font.deriveFont(48.0f);
+        Font font = Utils.readFont("Minecraft-Bogdan.ttf");
+        font = font.deriveFont(24.0f);
 
         BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
@@ -79,8 +73,8 @@ public final class TextRenderer {
 
         this.texture = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, this.texture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         int[] pixels = new int[this.imageWidth * this.imageHeight];
         image.getRGB(0, 0, this.imageWidth, this.imageHeight, pixels, 0, this.imageWidth);
@@ -109,36 +103,50 @@ public final class TextRenderer {
                 new ShaderProgram.ShaderData(GL_FRAGMENT_SHADER, "glyph.frag")
         ));
         this.shaderProgram.createUniform("resolution");
+        this.shaderProgram.createUniform("color");
     }
 
-    public void renderText(String text, int x, int y) {
-        int lines = 0;
+    public void renderText(String text, int x, int y, float r, float g, float b, float scale) {
+        int fontHeight = Math.round(this.fontHeight * scale);
+        int lines = 1;
         for (int i = 0; i < text.length(); i++) {
             if (text.charAt(i) == '\n') lines++;
         }
-        int textHeight = lines * this.fontHeight;
+        int textHeight = lines * fontHeight;
 
         glBindVertexArray(this.vaoId);
         glBindBuffer(GL_ARRAY_BUFFER, this.vboId);
         this.shaderProgram.bind();
         this.shaderProgram.setUniform("resolution", this.window.getWidth(), this.window.getHeight());
-
+        this.shaderProgram.setUniform("color", r, g, b);
         glBindTexture(GL_TEXTURE_2D, this.texture);
 
-        float scale = 1.0f;
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         float drawX = x;
-        float drawY = y;
+        float drawY = y - textHeight + (lines - 1) * fontHeight;
         for (int i = 0; i < text.length(); i++) {
-            Glyph g = this.glyphs.get(text.charAt(i));
-            float w = g.w * scale;
-            float h = g.h * scale;
+            char c = text.charAt(i);
+            if (c == '\n') {
+                drawY -= fontHeight;
+                drawX = x;
+                continue;
+            }
+            Glyph glyph = this.glyphs.get(c);
+            if (glyph == null) {
+                glyph = this.glyphs.get((char) 32);
+                System.err.println("Selected font is missing a glyph: `" + c + "` (" + (int) c + ")");
+            }
+            float w = glyph.w * scale;
+            float h = glyph.h * scale;
             float[] vertices = new float[]{
-                    drawX, drawY, g.x / this.imageWidth, g.y / this.imageHeight,
-                    drawX, drawY + h, g.x / this.imageWidth, (g.y + g.h) / this.imageHeight,
-                    drawX + w, drawY, (g.x + g.w) / this.imageWidth, g.y / this.imageHeight,
-                    drawX + w, drawY, (g.x + g.w) / this.imageWidth, g.y / this.imageHeight,
-                    drawX, drawY + h, g.x / this.imageWidth, (g.y + g.h) / this.imageHeight,
-                    drawX + w, drawY + h, (g.x + g.w) / this.imageWidth, (g.y + g.h) / this.imageHeight,
+                    drawX, drawY, glyph.x / this.imageWidth, glyph.y / this.imageHeight,
+                    drawX, drawY + h, glyph.x / this.imageWidth, (glyph.y + glyph.h) / this.imageHeight,
+                    drawX + w, drawY, (glyph.x + glyph.w) / this.imageWidth, glyph.y / this.imageHeight,
+                    drawX + w, drawY, (glyph.x + glyph.w) / this.imageWidth, glyph.y / this.imageHeight,
+                    drawX, drawY + h, glyph.x / this.imageWidth, (glyph.y + glyph.h) / this.imageHeight,
+                    drawX + w, drawY + h, (glyph.x + glyph.w) / this.imageWidth, (glyph.y + glyph.h) / this.imageHeight,
             };
 
             glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);

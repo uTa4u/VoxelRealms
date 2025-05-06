@@ -1,8 +1,5 @@
 package su.uTa4u.VoxelRealms.world;
 
-import org.joml.Vector3i;
-import su.uTa4u.VoxelRealms.engine.mesh.Mesh;
-
 public final class Voxel {
     public final int x;
     public final int y;

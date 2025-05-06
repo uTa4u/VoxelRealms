@@ -1,10 +1,5 @@
 package su.uTa4u.VoxelRealms.world;
 
-import su.uTa4u.VoxelRealms.engine.mesh.Mesh;
-
-import java.util.ArrayList;
-import java.util.List;
-
 public final class World {
     public static final int SIZE = 32;
 

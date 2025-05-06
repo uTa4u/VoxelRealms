@@ -1,8 +1,6 @@
 package su.uTa4u.VoxelRealms.engine.graphics;
 
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector2i;
 import org.lwjgl.opengl.GL20;
 import su.uTa4u.VoxelRealms.util.Utils;
 
@@ -78,6 +76,12 @@ public final class ShaderProgram {
         Integer loc = this.uniforms.get(name);
         if (loc == null) throw new RuntimeException("Could not find uniform: " + name + " in shader program " + this.id);
         glUniform2i(loc, v0, v1);
+    }
+
+    public void setUniform(String name, float v0, float v1, float v2) {
+        Integer loc = this.uniforms.get(name);
+        if (loc == null) throw new RuntimeException("Could not find uniform: " + name + " in shader program " + this.id);
+        glUniform3f(loc, v0, v1, v2);
     }
 
     public record ShaderData(int type, String name) {

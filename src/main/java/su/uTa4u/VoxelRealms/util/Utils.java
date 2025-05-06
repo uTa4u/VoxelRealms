@@ -1,7 +1,6 @@
 package su.uTa4u.VoxelRealms.util;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
