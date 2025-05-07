@@ -12,8 +12,8 @@ public final class NaiveMesher {
     public NaiveMesher() {
     }
 
-    public List<Mesh> createMeshForWorld(World world) {
-        List<Mesh> meshes = new ArrayList<>();
+    public MeshPair createMeshForWorld(World world) {
+        MeshPair meshes = new MeshPair();
         for (int cy = 0; cy < World.SIZE; cy++) {
             for (int cx = 0; cx < World.SIZE; cx++) {
                 for (int cz = 0; cz < World.SIZE; cz++) {
@@ -44,7 +44,11 @@ public final class NaiveMesher {
                                 if (!world.getVoxel(x, y, z - 1, cx, cy, cz).isOpaque()) {
                                     builder.addZnFace();
                                 }
-                                meshes.add(builder.build());
+                                if (voxel.isOpaque()) {
+                                    meshes.addOpaque(builder.build());
+                                } else {
+                                    meshes.addTransparent(builder.build());
+                                }
                             }
                         }
                     }
@@ -125,6 +129,32 @@ public final class NaiveMesher {
                     },
                     this.indices
             );
+        }
+    }
+
+    public static class MeshPair {
+        private final List<Mesh> opaque;
+        private final List<Mesh> transparent;
+
+        private MeshPair() {
+            this.opaque = new ArrayList<>();
+            this.transparent = new ArrayList<>();
+        }
+
+        private void addOpaque(Mesh m) {
+            this.opaque.add(m);
+        }
+
+        private void addTransparent(Mesh m) {
+            this.transparent.add(m);
+        }
+
+        public List<Mesh> getOpaque() {
+            return this.opaque;
+        }
+
+        public List<Mesh> getTransparent() {
+            return this.transparent;
         }
     }
 

@@ -21,7 +21,10 @@ public final class Main {
 
         World world = new World();
         NaiveMesher mesher = new NaiveMesher();
-        engine.getRenderer().addMeshes(mesher.createMeshForWorld(world));
+
+        NaiveMesher.MeshPair meshes = mesher.createMeshForWorld(world);
+        engine.getRenderer().addOpaqueMeshes(meshes.getOpaque());
+        engine.getRenderer().addTransparentMeshes(meshes.getTransparent());
 
         engine.run();
     }

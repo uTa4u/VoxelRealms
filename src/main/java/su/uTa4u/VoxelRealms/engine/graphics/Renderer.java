@@ -15,7 +15,8 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public final class Renderer {
     private final ShaderProgram shaderProgram;
-    private final List<Mesh> meshes;
+    private final List<Mesh> opaqueMeshes;
+    private final List<Mesh> transparentMeshes;
 
     public final Projection projection;
     public final Camera camera;
@@ -32,7 +33,8 @@ public final class Renderer {
                 new ShaderProgram.ShaderData(GL_FRAGMENT_SHADER, "voxel.frag")
         ));
 
-        this.meshes = new ArrayList<>();
+        this.opaqueMeshes = new ArrayList<>();
+        this.transparentMeshes = new ArrayList<>();
 
         this.camera = new Camera();
         this.shaderProgram.createUniform("viewMatrix");
@@ -53,11 +55,20 @@ public final class Renderer {
 
         if (Main.WIREFRAME_MODE) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-        for (Mesh mesh : this.meshes) {
+        for (Mesh mesh : this.opaqueMeshes) {
             glBindVertexArray(mesh.getVaoId());
             this.shaderProgram.validate();
             glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
         }
+
+        glDepthMask(false);
+        for (Mesh mesh : this.transparentMeshes) {
+            glBindVertexArray(mesh.getVaoId());
+            this.shaderProgram.validate();
+            glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
+        }
+        glDepthMask(true);
+
         glBindVertexArray(0);
 
         if (Main.WIREFRAME_MODE) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -65,7 +76,11 @@ public final class Renderer {
         this.shaderProgram.unbind();
     }
 
-    public void addMeshes(List<Mesh> meshes) {
-        this.meshes.addAll(meshes);
+    public void addOpaqueMeshes(List<Mesh> meshes) {
+        this.opaqueMeshes.addAll(meshes);
+    }
+
+    public void addTransparentMeshes(List<Mesh> meshes) {
+        this.transparentMeshes.addAll(meshes);
     }
 }
