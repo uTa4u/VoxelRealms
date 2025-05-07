@@ -15,7 +15,6 @@ public final class Chunk {
                 }
             }
         }
-//        this.setVoxel(Voxel.EMPTY, 0, 0, 0);
     }
 
     public Voxel getVoxel(int x, int y, int z) {

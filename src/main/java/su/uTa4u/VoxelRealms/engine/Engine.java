@@ -24,10 +24,12 @@ public final class Engine {
     public void run() {
         long previous = System.currentTimeMillis();
         long secTimer = System.currentTimeMillis();
+
         float msPerFrame = !this.isVsync ? 1000.0f / this.targetFps : 0;
         float deltaFrame = 0;
         int fps = 0;
         int renderFps = 0;
+        
         float msPerTick = 1000.0f / this.targetTps;
         float deltaTick = 0;
         int tps = 0;

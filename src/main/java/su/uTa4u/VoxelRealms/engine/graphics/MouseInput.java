@@ -5,6 +5,7 @@ import org.joml.Vector2f;
 import static org.lwjgl.glfw.GLFW.*;
 
 public final class MouseInput {
+    private final Vector2f currentPos;
     private final Vector2f previousPos;
     private final Vector2f delta;
 
@@ -13,24 +14,16 @@ public final class MouseInput {
     private boolean rightButtonPressed;
 
     public MouseInput(long windowHandle) {
+        this.currentPos = new Vector2f(0, 0);
         this.previousPos = new Vector2f(0, 0);
-        this.delta = new Vector2f();
+        this.delta = new Vector2f(0, 0);
         this.leftButtonPressed = false;
         this.rightButtonPressed = false;
         this.firstMouse = true;
 
         glfwSetCursorPosCallback(windowHandle, (handle, xpos, ypos) -> {
-            if (this.firstMouse) {
-                this.previousPos.x = (float) xpos;
-                this.previousPos.y = (float) ypos;
-                this.firstMouse = false;
-            }
-
-            this.delta.y = (float) xpos - this.previousPos.x;
-            this.delta.x = (float) ypos - this.previousPos.y;
-
-            this.previousPos.x = (float) xpos;
-            this.previousPos.y = (float) ypos;
+            this.currentPos.x = (float) xpos;
+            this.currentPos.y = (float) ypos;
         });
 //        glfwSetCursorEnterCallback(windowHandle, (handle, entered) -> this.inWindow = entered);
         glfwSetMouseButtonCallback(windowHandle, (handle, button, action, mode) -> {
@@ -40,6 +33,18 @@ public final class MouseInput {
     }
 
     public Vector2f getDelta() {
+        if (this.firstMouse) {
+            this.previousPos.x = this.currentPos.x;
+            this.previousPos.y = this.currentPos.y;
+            this.firstMouse = false;
+        }
+
+        this.delta.y = this.currentPos.x - this.previousPos.x;
+        this.delta.x = this.currentPos.y - this.previousPos.y;
+
+        this.previousPos.x = this.currentPos.x;
+        this.previousPos.y = this.currentPos.y;
+
         return this.delta;
     }
 
