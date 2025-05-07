@@ -162,6 +162,10 @@ public final class TextRenderer {
         glBindVertexArray(0);
     }
 
+    public int getFontHeight() {
+        return this.fontHeight;
+    }
+
     private record Glyph(float x, float y, float w, float h) {
     }
 }

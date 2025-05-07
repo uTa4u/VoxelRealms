@@ -3,6 +3,7 @@ package su.uTa4u.VoxelRealms.engine.graphics;
 import org.lwjgl.opengl.GL;
 import su.uTa4u.VoxelRealms.Main;
 import su.uTa4u.VoxelRealms.engine.Window;
+import su.uTa4u.VoxelRealms.engine.graphics.text.TextRenderer;
 import su.uTa4u.VoxelRealms.engine.mesh.Mesh;
 
 import java.util.ArrayList;
@@ -21,7 +22,13 @@ public final class Renderer {
     public final Projection projection;
     public final Camera camera;
 
+    private final Window window;
+    private final TextRenderer textRenderer;
+
     public Renderer(Window window) {
+        this.window = window;
+        this.textRenderer = new TextRenderer(this.window);
+
         GL.createCapabilities();
 
         glEnable(GL_DEPTH_TEST);
@@ -74,6 +81,14 @@ public final class Renderer {
         if (Main.WIREFRAME_MODE) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         this.shaderProgram.unbind();
+
+        this.renderText("Meshes: " + (this.transparentMeshes.size() + this.opaqueMeshes.size()) + "\n",
+                10, this.window.getHeight() - 10 - this.textRenderer.getFontHeight() * 2,
+                1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+    public void renderText(String text, int x, int y, float r, float g, float b, float scale) {
+        this.textRenderer.renderText(text, x, y, r, g, b, scale);
     }
 
     public void addOpaqueMeshes(List<Mesh> meshes) {

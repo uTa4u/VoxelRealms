@@ -6,7 +6,6 @@ import su.uTa4u.VoxelRealms.engine.graphics.text.TextRenderer;
 public final class Engine {
     private final Window window;
     private final Renderer renderer;
-    private final TextRenderer textRenderer;
 
     private final boolean isVsync;
     private final int targetFps;
@@ -16,7 +15,6 @@ public final class Engine {
         this.isVsync = targetFps <= 0;
         this.window = new Window(this, title, initWidth, initHeight, this.isVsync);
         this.renderer = new Renderer(this.window);
-        this.textRenderer = new TextRenderer(this.window);
         this.targetFps = targetFps;
         this.targetTps = targetTps;
     }
@@ -57,8 +55,7 @@ public final class Engine {
 
             if (this.isVsync || deltaFrame >= 1.0f) {
                 this.renderer.render();
-
-                this.textRenderer.renderText("FPS: " + renderFps + "\nTPS: " + renderTps, 10, this.window.getHeight() - 10, 1.0f, 1.0f, 1.0f, 1f);
+                this.renderer.renderText("FPS: " + renderFps + "\nTPS: " + renderTps, 10, this.window.getHeight() - 10, 1.0f, 1.0f, 1.0f, 1.0f);
 
                 fps++;
                 deltaFrame--;

@@ -13,7 +13,8 @@ jar {
 }
 
 application {
-    mainClass = "${group}.${title}.Main"
+    mainClass = "su.uTa4u.VoxelRealms.Main"
+    applicationDefaultJvmArgs = ["-Xmx4096m"]
 }
 
 idea {

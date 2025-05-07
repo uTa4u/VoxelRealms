@@ -2,7 +2,6 @@ package su.uTa4u.VoxelRealms.engine.mesh;
 
 import su.uTa4u.VoxelRealms.world.Chunk;
 import su.uTa4u.VoxelRealms.world.Voxel;
-import su.uTa4u.VoxelRealms.world.VoxelMaterial;
 import su.uTa4u.VoxelRealms.world.World;
 
 import java.util.ArrayList;
@@ -20,12 +19,15 @@ public final class NaiveMesher {
                     Chunk chunk = world.getChunk(cx, cy, cz);
                     if (chunk == null) continue;
 
+                    MeshBuilder opaque = new MeshBuilder();
+                    MeshBuilder transparent = new MeshBuilder();
                     for (int y = 0; y < Chunk.SIZE; ++y) {
                         for (int x = 0; x < Chunk.SIZE; ++x) {
                             for (int z = 0; z < Chunk.SIZE; ++z) {
                                 Voxel voxel = chunk.getVoxel(x, y, z);
                                 if (voxel == null) continue;
-                                MeshBuilder builder = new MeshBuilder(voxel.getMaterial(), x, y, z);
+                                MeshBuilder builder = voxel.isOpaque() ? opaque : transparent;
+                                builder.addVoxel(voxel, cx * Chunk.SIZE + x, cy * Chunk.SIZE + y, cz * Chunk.SIZE + z);
                                 if (!world.getVoxel(x + 1, y, z, cx, cy, cz).isOpaque()) {
                                     builder.addXpFace();
                                 }
@@ -44,15 +46,12 @@ public final class NaiveMesher {
                                 if (!world.getVoxel(x, y, z - 1, cx, cy, cz).isOpaque()) {
                                     builder.addZnFace();
                                 }
-                                if (voxel.isOpaque()) {
-                                    meshes.addOpaque(builder.build());
-                                } else {
-                                    meshes.addTransparent(builder.build());
-                                }
+                                builder.incVoxelCount();
                             }
                         }
                     }
-
+                    meshes.addOpaque(opaque.build());
+                    meshes.addTransparent(transparent.build());
                 }
             }
         }
@@ -60,78 +59,143 @@ public final class NaiveMesher {
     }
 
     private static class MeshBuilder {
-        private static final int[] XP_FACE = new int[]{5, 7, 4, 4, 7, 6};
-        private static final int[] XN_FACE = new int[]{1, 3, 0, 0, 3, 2};
-        private static final int[] YP_FACE = new int[]{3, 2, 7, 7, 2, 6};
-        private static final int[] YN_FACE = new int[]{1, 0, 5, 5, 0, 4};
-        private static final int[] ZP_FACE = new int[]{1, 3, 5, 5, 3, 7};
-        private static final int[] ZN_FACE = new int[]{0, 2, 4, 4, 2, 6};
+        private static final int POSITIONS_OFFSET = 24;
+        private static final int COLORS_OFFSET = 32;
+        private static final int INDEX_OFFSET = 8;
+        private static final int FACE_OFFSET = 6;
+        private static final int FACE_COUNT_MAX = 6;
 
-        private final VoxelMaterial m;
-        private final int x;
-        private final int y;
-        private final int z;
+        private final int[] positions;
+        private final float[] colors;
         private final int[] indices;
+        private int voxelCount;
+        private int faceCount;
 
-        private MeshBuilder(VoxelMaterial m, int x, int y, int z) {
-            this.m = m;
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.indices = new int[36];
+        private MeshBuilder() {
+            this.positions = new int[Chunk.SIZE * Chunk.SIZE * Chunk.SIZE * POSITIONS_OFFSET];
+            this.colors = new float[Chunk.SIZE * Chunk.SIZE * Chunk.SIZE * COLORS_OFFSET];
+            this.indices = new int[Chunk.SIZE * Chunk.SIZE * Chunk.SIZE * FACE_OFFSET * FACE_COUNT_MAX];
+            this.voxelCount = 0;
+            this.faceCount = 0;
+        }
+
+        private void addVoxel(Voxel v, int x, int y, int z) {
+            int[] positions = new int[]{
+                    x, y, z,
+                    x, y, z + 1,
+                    x, y + 1, z,
+                    x, y + 1, z + 1,
+                    x + 1, y, z,
+                    x + 1, y, z + 1,
+                    x + 1, y + 1, z,
+                    x + 1, y + 1, z + 1
+            };
+            System.arraycopy(positions, 0, this.positions, this.voxelCount * POSITIONS_OFFSET, positions.length);
+            float[] colors = new float[]{
+                    v.getMaterial().r, v.getMaterial().g, v.getMaterial().b, v.getMaterial().a,
+                    v.getMaterial().r, v.getMaterial().g, v.getMaterial().b, v.getMaterial().a,
+                    v.getMaterial().r, v.getMaterial().g, v.getMaterial().b, v.getMaterial().a,
+                    v.getMaterial().r, v.getMaterial().g, v.getMaterial().b, v.getMaterial().a,
+                    v.getMaterial().r, v.getMaterial().g, v.getMaterial().b, v.getMaterial().a,
+                    v.getMaterial().r, v.getMaterial().g, v.getMaterial().b, v.getMaterial().a,
+                    v.getMaterial().r, v.getMaterial().g, v.getMaterial().b, v.getMaterial().a,
+                    v.getMaterial().r, v.getMaterial().g, v.getMaterial().b, v.getMaterial().a,
+            };
+            System.arraycopy(colors, 0, this.colors, this.voxelCount * COLORS_OFFSET, colors.length);
         }
 
         private void addZpFace() {
-            System.arraycopy(ZP_FACE, 0, this.indices, 0, 6);
+            int[] face = new int[]{
+                    1 + this.voxelCount * INDEX_OFFSET,
+                    3 + this.voxelCount * INDEX_OFFSET,
+                    5 + this.voxelCount * INDEX_OFFSET,
+                    5 + this.voxelCount * INDEX_OFFSET,
+                    3 + this.voxelCount * INDEX_OFFSET,
+                    7 + this.voxelCount * INDEX_OFFSET,
+            };
+            System.arraycopy(face, 0, this.indices, this.faceCount * FACE_OFFSET, face.length);
+            this.faceCount++;
         }
 
         private void addZnFace() {
-            System.arraycopy(ZN_FACE, 0, this.indices, 6, 6);
+            int[] face = new int[]{
+                    0 + this.voxelCount * INDEX_OFFSET,
+                    2 + this.voxelCount * INDEX_OFFSET,
+                    4 + this.voxelCount * INDEX_OFFSET,
+                    4 + this.voxelCount * INDEX_OFFSET,
+                    2 + this.voxelCount * INDEX_OFFSET,
+                    6 + this.voxelCount * INDEX_OFFSET,
+            };
+            System.arraycopy(face, 0, this.indices, this.faceCount * FACE_OFFSET, face.length);
+            this.faceCount++;
         }
 
         private void addXpFace() {
-            System.arraycopy(XP_FACE, 0, this.indices, 12, 6);
+            int[] face = new int[]{
+                    5 + this.voxelCount * INDEX_OFFSET,
+                    7 + this.voxelCount * INDEX_OFFSET,
+                    4 + this.voxelCount * INDEX_OFFSET,
+                    4 + this.voxelCount * INDEX_OFFSET,
+                    7 + this.voxelCount * INDEX_OFFSET,
+                    6 + this.voxelCount * INDEX_OFFSET,
+            };
+            System.arraycopy(face, 0, this.indices, this.faceCount * FACE_OFFSET, face.length);
+            this.faceCount++;
         }
 
         private void addXnFace() {
-            System.arraycopy(XN_FACE, 0, this.indices, 18, 6);
+            int[] face = new int[]{
+                    1 + this.voxelCount * INDEX_OFFSET,
+                    3 + this.voxelCount * INDEX_OFFSET,
+                    0 + this.voxelCount * INDEX_OFFSET,
+                    0 + this.voxelCount * INDEX_OFFSET,
+                    3 + this.voxelCount * INDEX_OFFSET,
+                    2 + this.voxelCount * INDEX_OFFSET,
+            };
+            System.arraycopy(face, 0, this.indices, this.faceCount * FACE_OFFSET, face.length);
+            this.faceCount++;
         }
 
         private void addYpFace() {
-            System.arraycopy(YP_FACE, 0, this.indices, 24, 6);
+            int[] face = new int[]{
+                    3 + this.voxelCount * INDEX_OFFSET,
+                    2 + this.voxelCount * INDEX_OFFSET,
+                    7 + this.voxelCount * INDEX_OFFSET,
+                    7 + this.voxelCount * INDEX_OFFSET,
+                    2 + this.voxelCount * INDEX_OFFSET,
+                    6 + this.voxelCount * INDEX_OFFSET,
+            };
+            System.arraycopy(face, 0, this.indices, this.faceCount * FACE_OFFSET, face.length);
+            this.faceCount++;
         }
 
         private void addYnFace() {
-            System.arraycopy(YN_FACE, 0, this.indices, 30, 6);
+            int[] face = new int[]{
+                    1 + this.voxelCount * INDEX_OFFSET,
+                    0 + this.voxelCount * INDEX_OFFSET,
+                    5 + this.voxelCount * INDEX_OFFSET,
+                    5 + this.voxelCount * INDEX_OFFSET,
+                    0 + this.voxelCount * INDEX_OFFSET,
+                    4 + this.voxelCount * INDEX_OFFSET,
+            };
+            System.arraycopy(face, 0, this.indices, this.faceCount * FACE_OFFSET, face.length);
+            this.faceCount++;
+        }
+
+        private void incVoxelCount() {
+            this.voxelCount++;
         }
 
         private Mesh build() {
-            return new Mesh(
-                    new int[]{
-                            this.x, this.y, this.z,
-                            this.x, this.y, this.z + 1,
-                            this.x, this.y + 1, this.z,
-                            this.x, this.y + 1, this.z + 1,
-                            this.x + 1, this.y, this.z,
-                            this.x + 1, this.y, this.z + 1,
-                            this.x + 1, this.y + 1, this.z,
-                            this.x + 1, this.y + 1, this.z + 1
-                    },
-                    new float[]{
-                            this.m.r, this.m.g, this.m.b, this.m.a,
-                            this.m.r, this.m.g, this.m.b, this.m.a,
-                            this.m.r, this.m.g, this.m.b, this.m.a,
-                            this.m.r, this.m.g, this.m.b, this.m.a,
-                            this.m.r, this.m.g, this.m.b, this.m.a,
-                            this.m.r, this.m.g, this.m.b, this.m.a,
-                            this.m.r, this.m.g, this.m.b, this.m.a,
-                            this.m.r, this.m.g, this.m.b, this.m.a,
-                    },
-                    this.indices
-            );
+            return new Mesh(this.positions, this.colors, this.indices);
         }
     }
 
+    // TODO:
+    //  Make this into a ChunkMesh that will contain one opaque mesh and one transparent mesh
+    //  as well as face count and other useful information
+    //  Try using Lists instead of arrays to reduce memory allocation. Launch with World.SIZE = 8 to compare
+    //  Move MeshBuilder inside of ChunkMesh
     public static class MeshPair {
         private final List<Mesh> opaque;
         private final List<Mesh> transparent;
