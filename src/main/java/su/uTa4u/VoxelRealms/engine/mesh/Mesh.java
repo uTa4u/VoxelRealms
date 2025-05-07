@@ -1,5 +1,8 @@
 package su.uTa4u.VoxelRealms.engine.mesh;
 
+import su.uTa4u.VoxelRealms.world.Voxel;
+import su.uTa4u.VoxelRealms.world.VoxelMaterial;
+
 import static org.lwjgl.opengl.GL30.*;
 
 public final class Mesh {
@@ -25,7 +28,7 @@ public final class Mesh {
         glBindBuffer(GL_ARRAY_BUFFER, vboId);
         glBufferData(GL_ARRAY_BUFFER, colors, GL_STATIC_DRAW);
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+        glVertexAttribPointer(1, 4, GL_FLOAT, false, 0, 0);
 
         // Index
         int eboId = glGenBuffers();

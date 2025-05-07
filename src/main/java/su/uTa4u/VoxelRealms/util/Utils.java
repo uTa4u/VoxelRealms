@@ -48,4 +48,8 @@ public final class Utils {
         }
     }
 
+    public static int posToIndex(int x, int y, int z, int size) {
+        return x + (z * size) + (y * size * size);
+    }
+
 }

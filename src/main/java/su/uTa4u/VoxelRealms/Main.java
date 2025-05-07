@@ -12,6 +12,8 @@ public final class Main {
     private static final int TARGET_FPS = Integer.MAX_VALUE;
     private static final int TARGET_TPS = 20;
 
+    public static final boolean WIREFRAME_MODE = false;
+
     public static void main(String[] args) {
         Configuration.STACK_SIZE.set(1024*8);
 

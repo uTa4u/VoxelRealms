@@ -1,6 +1,7 @@
 package su.uTa4u.VoxelRealms.engine.graphics;
 
 import org.lwjgl.opengl.GL;
+import su.uTa4u.VoxelRealms.Main;
 import su.uTa4u.VoxelRealms.engine.Window;
 import su.uTa4u.VoxelRealms.engine.mesh.Mesh;
 
@@ -23,6 +24,8 @@ public final class Renderer {
         GL.createCapabilities();
 
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         this.shaderProgram = new ShaderProgram(List.of(
                 new ShaderProgram.ShaderData(GL_VERTEX_SHADER, "voxel.vert"),
@@ -37,7 +40,7 @@ public final class Renderer {
         this.projection = new Projection(window.getWidth(), window.getHeight());
         this.shaderProgram.createUniform("projectionMatrix");
 
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.69f, 0.85f, 0.9f, 1.0f);
     }
 
     public void render() {
@@ -48,12 +51,16 @@ public final class Renderer {
         this.shaderProgram.setUniform("viewMatrix", this.camera.getMatrix());
         this.shaderProgram.setUniform("projectionMatrix", this.projection.getMatrix());
 
+        if (Main.WIREFRAME_MODE) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
         for (Mesh mesh : this.meshes) {
             glBindVertexArray(mesh.getVaoId());
             this.shaderProgram.validate();
             glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
         }
         glBindVertexArray(0);
+
+        if (Main.WIREFRAME_MODE) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         this.shaderProgram.unbind();
     }

@@ -1,16 +1,19 @@
 package su.uTa4u.VoxelRealms.world;
 
 public final class Voxel {
-    public final int x;
-    public final int y;
-    public final int z;
+    public static final Voxel EMPTY = new Voxel(VoxelMaterial.AIR);
 
-    public final VoxelMaterial material;
+    private final VoxelMaterial material;
 
-    public Voxel(int x, int y, int z, VoxelMaterial material) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    public Voxel(VoxelMaterial material) {
         this.material = material;
+    }
+
+    public VoxelMaterial getMaterial() {
+        return this.material;
+    }
+
+    public boolean isOpaque() {
+        return this.material != VoxelMaterial.AIR;
     }
 }
