@@ -196,6 +196,7 @@ public final class NaiveMesher {
     //  as well as face count and other useful information
     //  Try using Lists instead of arrays to reduce memory allocation. Launch with World.SIZE = 8 to compare
     //  Move MeshBuilder inside of ChunkMesh
+    //  Add positions after faces have been added, only add positions of vertices that are gonna be used
     public static class MeshPair {
         private final List<Mesh> opaque;
         private final List<Mesh> transparent;

@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import su.uTa4u.VoxelRealms.util.Utils;
 
 public final class World {
-    public static final int SIZE = 4;
+    public static final int SIZE = 1;
 
     private final Chunk[] chunks = new Chunk[SIZE * SIZE * SIZE];
 

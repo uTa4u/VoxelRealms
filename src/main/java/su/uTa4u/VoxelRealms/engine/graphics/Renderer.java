@@ -5,6 +5,9 @@ import su.uTa4u.VoxelRealms.Main;
 import su.uTa4u.VoxelRealms.engine.Window;
 import su.uTa4u.VoxelRealms.engine.graphics.text.TextRenderer;
 import su.uTa4u.VoxelRealms.engine.mesh.Mesh;
+import su.uTa4u.VoxelRealms.engine.mesh.NaiveMesher;
+import su.uTa4u.VoxelRealms.engine.mesh.VertexArray;
+import su.uTa4u.VoxelRealms.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +19,11 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public final class Renderer {
     private final ShaderProgram shaderProgram;
+    private final VertexArray vertexArray;
+
+    private final World world;
+    private final NaiveMesher mesher;
+
     private final List<Mesh> opaqueMeshes;
     private final List<Mesh> transparentMeshes;
 
@@ -28,6 +36,7 @@ public final class Renderer {
     public Renderer(Window window) {
         this.window = window;
         this.textRenderer = new TextRenderer(this.window);
+        this.vertexArray = new VertexArray();
 
         GL.createCapabilities();
 
@@ -50,9 +59,16 @@ public final class Renderer {
         this.shaderProgram.createUniform("projectionMatrix");
 
         glClearColor(0.69f, 0.85f, 0.9f, 1.0f);
+
+        this.world = new World();
+        this.mesher = new NaiveMesher();
     }
 
     public void render() {
+        NaiveMesher.MeshPair meshes = this.mesher.createMeshForWorld(this.world);
+        this.addOpaqueMeshes(meshes.getOpaque());
+        this.addTransparentMeshes(meshes.getTransparent());
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         this.shaderProgram.bind();
@@ -60,31 +76,40 @@ public final class Renderer {
         this.shaderProgram.setUniform("viewMatrix", this.camera.getMatrix());
         this.shaderProgram.setUniform("projectionMatrix", this.projection.getMatrix());
 
-        if (Main.WIREFRAME_MODE) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        if (Main.WIREFRAME_MODE) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+
+        this.vertexArray.bind();
 
         for (Mesh mesh : this.opaqueMeshes) {
-            glBindVertexArray(mesh.getVaoId());
+            this.vertexArray.setData(mesh);
             this.shaderProgram.validate();
             glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
         }
 
         glDepthMask(false);
         for (Mesh mesh : this.transparentMeshes) {
-            glBindVertexArray(mesh.getVaoId());
+            this.vertexArray.setData(mesh);
             this.shaderProgram.validate();
             glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
         }
         glDepthMask(true);
 
-        glBindVertexArray(0);
+        if (Main.WIREFRAME_MODE) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
 
-        if (Main.WIREFRAME_MODE) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        this.vertexArray.unbind();
 
         this.shaderProgram.unbind();
 
         this.renderText("Meshes: " + (this.transparentMeshes.size() + this.opaqueMeshes.size()) + "\n",
                 10, this.window.getHeight() - 10 - this.textRenderer.getFontHeight() * 2,
                 1.0f, 1.0f, 1.0f, 1.0f);
+
+        this.opaqueMeshes.clear();
+        this.transparentMeshes.clear();
     }
 
     public void renderText(String text, int x, int y, float r, float g, float b, float scale) {

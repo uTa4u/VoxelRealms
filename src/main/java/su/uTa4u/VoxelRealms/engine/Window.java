@@ -4,13 +4,17 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GLDebugMessageCallbackI;
 import org.lwjgl.system.MemoryStack;
+import su.uTa4u.VoxelRealms.Main;
 import su.uTa4u.VoxelRealms.engine.graphics.MouseInput;
 
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL43.glDebugMessageCallback;
+import static org.lwjgl.opengl.GLUtil.setupDebugMessageCallback;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public final class Window {
@@ -47,7 +51,9 @@ public final class Window {
 
         GL.createCapabilities();
 
-//        glDebugMessageCallback((GLDebugMessageCallbackI) setupDebugMessageCallback(), NULL);
+        if (Main.DEBUG) {
+            glDebugMessageCallback((GLDebugMessageCallbackI) setupDebugMessageCallback(), NULL);
+        }
 
         GLFWErrorCallback.createPrint(System.err).set();
 
