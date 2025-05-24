@@ -52,4 +52,22 @@ public final class Utils {
         return x + (z * size) + (y * size * size);
     }
 
+    public static void swapInIntArray(int[] array, int from, int to, int size) {
+        int[] temp = new int[size];
+        from *= size;
+        to *= size;
+        System.arraycopy(array, from, temp, 0, size);
+        System.arraycopy(array, to, array, from, size);
+        System.arraycopy(temp, 0, array, to, size);
+    }
+
+    public static void swapInFloatArray(float[] array, int from, int to, int size) {
+        float[] temp = new float[size];
+        from *= size;
+        to *= size;
+        System.arraycopy(array, from, temp, 0, size);
+        System.arraycopy(array, to, array, from, size);
+        System.arraycopy(temp, 0, array, to, size);
+    }
+
 }

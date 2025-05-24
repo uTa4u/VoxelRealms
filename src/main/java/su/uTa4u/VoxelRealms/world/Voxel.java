@@ -14,6 +14,10 @@ public final class Voxel {
     }
 
     public boolean isOpaque() {
-        return this.material != VoxelMaterial.AIR;
+        return this.material.a == 1.0f;
+    }
+
+    public boolean isSameMaterial(Voxel v) {
+        return this.material == v.material;
     }
 }

@@ -4,6 +4,7 @@ import org.lwjgl.opengl.GL;
 import su.uTa4u.VoxelRealms.Main;
 import su.uTa4u.VoxelRealms.engine.Window;
 import su.uTa4u.VoxelRealms.engine.graphics.text.TextRenderer;
+import su.uTa4u.VoxelRealms.engine.mesh.ChunkMesh;
 import su.uTa4u.VoxelRealms.engine.mesh.Mesh;
 import su.uTa4u.VoxelRealms.engine.mesh.NaiveMesher;
 import su.uTa4u.VoxelRealms.engine.mesh.VertexArray;
@@ -40,10 +41,6 @@ public final class Renderer {
 
         GL.createCapabilities();
 
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
         this.shaderProgram = new ShaderProgram(List.of(
                 new ShaderProgram.ShaderData(GL_VERTEX_SHADER, "voxel.vert"),
                 new ShaderProgram.ShaderData(GL_FRAGMENT_SHADER, "voxel.frag")
@@ -60,14 +57,18 @@ public final class Renderer {
 
         glClearColor(0.69f, 0.85f, 0.9f, 1.0f);
 
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         this.world = new World();
         this.mesher = new NaiveMesher();
     }
 
     public void render() {
-        NaiveMesher.MeshPair meshes = this.mesher.createMeshForWorld(this.world);
-        this.addOpaqueMeshes(meshes.getOpaque());
-        this.addTransparentMeshes(meshes.getTransparent());
+        List<ChunkMesh> meshes = this.mesher.createMeshForWorld(this.world, this.camera.getPosition());
+        for (ChunkMesh chunkMesh : meshes) {
+            this.opaqueMeshes.add(chunkMesh.getOpaque());
+            this.transparentMeshes.add(chunkMesh.getTransparent());
+        }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -81,6 +82,9 @@ public final class Renderer {
         }
 
         this.vertexArray.bind();
+
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
 
         for (Mesh mesh : this.opaqueMeshes) {
             this.vertexArray.setData(mesh);
@@ -96,6 +100,9 @@ public final class Renderer {
         }
         glDepthMask(true);
 
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_BLEND);
+
         if (Main.WIREFRAME_MODE) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
@@ -104,9 +111,10 @@ public final class Renderer {
 
         this.shaderProgram.unbind();
 
-        this.renderText("Meshes: " + (this.transparentMeshes.size() + this.opaqueMeshes.size()) + "\n",
-                10, this.window.getHeight() - 10 - this.textRenderer.getFontHeight() * 2,
-                1.0f, 1.0f, 1.0f, 1.0f);
+//        this.renderText("Meshes: " + (this.transparentMeshes.size() + this.opaqueMeshes.size()) + "\nTriangles: " +
+//                meshes.stream().mapToInt(ChunkMesh::getTriangleCount).sum() + "\n",
+//                10, this.window.getHeight() - 10 - this.textRenderer.getFontHeight() * 2,
+//                1.0f, 1.0f, 1.0f, 1.0f);
 
         this.opaqueMeshes.clear();
         this.transparentMeshes.clear();
@@ -114,13 +122,5 @@ public final class Renderer {
 
     public void renderText(String text, int x, int y, float r, float g, float b, float scale) {
         this.textRenderer.renderText(text, x, y, r, g, b, scale);
-    }
-
-    public void addOpaqueMeshes(List<Mesh> meshes) {
-        this.opaqueMeshes.addAll(meshes);
-    }
-
-    public void addTransparentMeshes(List<Mesh> meshes) {
-        this.transparentMeshes.addAll(meshes);
     }
 }

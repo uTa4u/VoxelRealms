@@ -110,4 +110,8 @@ public final class Camera {
         );
         delta.set(0.0f);
     }
+
+    public Vector3f getPosition() {
+        return this.position;
+    }
 }

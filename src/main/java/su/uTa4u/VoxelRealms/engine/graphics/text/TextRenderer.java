@@ -122,7 +122,6 @@ public final class TextRenderer {
         glBindTexture(GL_TEXTURE_2D, this.texture);
 
         glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         float drawX = x;
         float drawY = y - textHeight + (lines - 1) * fontHeight;
@@ -156,6 +155,8 @@ public final class TextRenderer {
             glDrawArrays(GL_TRIANGLES, 0, 6);
             drawX += w;
         }
+
+        glDisable(GL_BLEND);
 
         this.shaderProgram.unbind();
         glBindBuffer(GL_ARRAY_BUFFER, 0);

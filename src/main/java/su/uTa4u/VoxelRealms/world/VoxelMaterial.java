@@ -6,12 +6,14 @@ public final class VoxelMaterial {
     public static final VoxelMaterial AIR = new VoxelMaterial(0, 0, 0, 0);
     public static final VoxelMaterial STONE = new VoxelMaterial(128, 128, 128, 255);
     public static final VoxelMaterial GRASS = new VoxelMaterial(144, 244, 144, 255);
+    public static final VoxelMaterial GLASS = new VoxelMaterial(144, 0, 0, 63);
 
-    private static final Random RANDOM = new Random();
+    private static final Random RANDOM = new Random(1);
     private static final VoxelMaterial[] VOXEL_MATERIALS = new VoxelMaterial[]{
             VoxelMaterial.AIR,
             VoxelMaterial.STONE,
             VoxelMaterial.GRASS,
+            VoxelMaterial.GLASS,
     };
     private static final int VOXEL_MATERIAL_COUNT = VOXEL_MATERIALS.length;
 
