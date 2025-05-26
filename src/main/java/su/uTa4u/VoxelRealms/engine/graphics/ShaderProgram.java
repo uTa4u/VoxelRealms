@@ -12,6 +12,7 @@ import static org.lwjgl.opengl.GL20.*;
 
 public final class ShaderProgram {
     private final int id;
+    // TODO: Use Object2IntOpenHashMap
     private final Map<String, Integer> uniforms;
 
     public ShaderProgram(List<ShaderData> shaders) {
