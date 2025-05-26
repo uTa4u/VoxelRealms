@@ -84,7 +84,6 @@ public final class Renderer {
         this.vertexArray.bind();
 
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
 
         for (Mesh mesh : this.opaqueMeshes) {
             this.vertexArray.setData(mesh);
@@ -92,6 +91,7 @@ public final class Renderer {
             glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
         }
 
+        glEnable(GL_BLEND);
         glDepthMask(false);
         for (Mesh mesh : this.transparentMeshes) {
             this.vertexArray.setData(mesh);
@@ -99,9 +99,9 @@ public final class Renderer {
             glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
         }
         glDepthMask(true);
+        glDisable(GL_BLEND);
 
         glDisable(GL_DEPTH_TEST);
-        glDisable(GL_BLEND);
 
         if (Main.WIREFRAME_MODE) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
