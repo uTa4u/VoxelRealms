@@ -1,13 +1,12 @@
-package su.uTa4u.VoxelRealms.engine.graphics;
+package su.uTa4u.VoxelRealms.graphics;
 
 import org.lwjgl.opengl.GL;
 import su.uTa4u.VoxelRealms.Main;
-import su.uTa4u.VoxelRealms.engine.Window;
-import su.uTa4u.VoxelRealms.engine.graphics.text.TextRenderer;
-import su.uTa4u.VoxelRealms.engine.mesh.ChunkMesh;
-import su.uTa4u.VoxelRealms.engine.mesh.Mesh;
-import su.uTa4u.VoxelRealms.engine.mesh.NaiveMesher;
-import su.uTa4u.VoxelRealms.engine.mesh.VertexArray;
+import su.uTa4u.VoxelRealms.graphics.text.TextRenderer;
+import su.uTa4u.VoxelRealms.graphics.mesh.ChunkMesh;
+import su.uTa4u.VoxelRealms.graphics.mesh.Mesh;
+import su.uTa4u.VoxelRealms.graphics.mesh.NaiveMesher;
+import su.uTa4u.VoxelRealms.graphics.mesh.VertexArray;
 import su.uTa4u.VoxelRealms.world.World;
 
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import java.util.List;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public final class Renderer {
     private final ShaderProgram shaderProgram;

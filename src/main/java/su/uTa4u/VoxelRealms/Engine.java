@@ -1,7 +1,7 @@
-package su.uTa4u.VoxelRealms.engine;
+package su.uTa4u.VoxelRealms;
 
-import su.uTa4u.VoxelRealms.engine.graphics.Renderer;
-import su.uTa4u.VoxelRealms.engine.graphics.text.TextRenderer;
+import su.uTa4u.VoxelRealms.graphics.Renderer;
+import su.uTa4u.VoxelRealms.graphics.Window;
 
 public final class Engine {
     private final Window window;
@@ -74,7 +74,7 @@ public final class Engine {
         this.window.cleanup();
     }
 
-    void resize(int width, int height) {
+    public void resize(int width, int height) {
         this.window.setSize(width, height);
         this.renderer.projection.update(width, height);
     }

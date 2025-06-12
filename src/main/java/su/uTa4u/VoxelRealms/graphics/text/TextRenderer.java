@@ -1,8 +1,8 @@
-package su.uTa4u.VoxelRealms.engine.graphics.text;
+package su.uTa4u.VoxelRealms.graphics.text;
 
 import org.lwjgl.system.MemoryStack;
-import su.uTa4u.VoxelRealms.engine.Window;
-import su.uTa4u.VoxelRealms.engine.graphics.ShaderProgram;
+import su.uTa4u.VoxelRealms.graphics.Window;
+import su.uTa4u.VoxelRealms.graphics.ShaderProgram;
 import su.uTa4u.VoxelRealms.util.Utils;
 
 import java.awt.*;

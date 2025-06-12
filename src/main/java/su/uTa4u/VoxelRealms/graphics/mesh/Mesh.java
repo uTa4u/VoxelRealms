@@ -1,14 +1,9 @@
-package su.uTa4u.VoxelRealms.engine.mesh;
+package su.uTa4u.VoxelRealms.graphics.mesh;
 
 import org.joml.Vector3f;
-import su.uTa4u.VoxelRealms.engine.graphics.Camera;
-import su.uTa4u.VoxelRealms.util.Utils;
-import su.uTa4u.VoxelRealms.world.Chunk;
 import su.uTa4u.VoxelRealms.world.Voxel;
 import su.uTa4u.VoxelRealms.world.VoxelMaterial;
 
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.*;
 import java.util.stream.IntStream;
 

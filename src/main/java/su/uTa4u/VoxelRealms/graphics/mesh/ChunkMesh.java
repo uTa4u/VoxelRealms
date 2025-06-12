@@ -1,8 +1,4 @@
-package su.uTa4u.VoxelRealms.engine.mesh;
-
-import org.joml.Vector3f;
-
-import java.util.Comparator;
+package su.uTa4u.VoxelRealms.graphics.mesh;
 
 public final class ChunkMesh {
     private final Mesh opaque;

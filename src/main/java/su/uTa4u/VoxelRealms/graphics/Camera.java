@@ -1,9 +1,8 @@
-package su.uTa4u.VoxelRealms.engine.graphics;
+package su.uTa4u.VoxelRealms.graphics;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import su.uTa4u.VoxelRealms.engine.Window;
 
 import static org.lwjgl.glfw.GLFW.*;
 

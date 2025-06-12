@@ -1,4 +1,4 @@
-package su.uTa4u.VoxelRealms.engine;
+package su.uTa4u.VoxelRealms.graphics;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -6,8 +6,10 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLDebugMessageCallbackI;
 import org.lwjgl.system.MemoryStack;
+import su.uTa4u.VoxelRealms.Engine;
 import su.uTa4u.VoxelRealms.Main;
-import su.uTa4u.VoxelRealms.engine.graphics.MouseInput;
+import su.uTa4u.VoxelRealms.graphics.MouseInput;
+import su.uTa4u.VoxelRealms.logger.Logger;
 
 import java.nio.FloatBuffer;
 
@@ -18,6 +20,8 @@ import static org.lwjgl.opengl.GLUtil.setupDebugMessageCallback;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public final class Window {
+    private static final Logger LOGGER = Logger.create();
+
     private final MouseInput mouseInput;
 
     private final long handle;
@@ -26,26 +30,20 @@ public final class Window {
     private final float scaleX;
     private final float scaleY;
 
-    Window(Engine engine, String title, int initWidth, int initHeight, boolean isVsync) {
+    public Window(Engine engine, String title, int initWidth, int initHeight, boolean isVsync) {
         if (!glfwInit()) throw new RuntimeException("Failed to initialize GLFW");
 
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-        this.handle = GLFW.glfwCreateWindow(
-                initWidth,
-                initHeight,
-                title,
-                NULL,
-                NULL
-        );
+        this.handle = GLFW.glfwCreateWindow(initWidth, initHeight, title, NULL, NULL);
         if (this.handle == NULL) throw new RuntimeException("Failed to create the GLFW window");
         this.setSize(initWidth, initHeight);
 
         int glVerMajor = glfwGetWindowAttrib(this.handle, GLFW_CONTEXT_VERSION_MAJOR);
         int glVerMinor = glfwGetWindowAttrib(this.handle, GLFW_CONTEXT_VERSION_MINOR);
-        System.out.println("[INFO] OpenGL Version " + glVerMajor + "." + glVerMinor);
+        LOGGER.info("OpenGL Version " + glVerMajor + "." + glVerMinor);
 
         glfwMakeContextCurrent(this.handle);
 

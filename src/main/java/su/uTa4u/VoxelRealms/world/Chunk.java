@@ -3,7 +3,7 @@ package su.uTa4u.VoxelRealms.world;
 import su.uTa4u.VoxelRealms.util.Utils;
 
 public final class Chunk {
-    public static final int SIZE = 4;
+    public static final int SIZE = 32;
     public static final int SIZE_HALF = SIZE / 2;
     public static final int SIZE_QUBED = SIZE * SIZE * SIZE;
 

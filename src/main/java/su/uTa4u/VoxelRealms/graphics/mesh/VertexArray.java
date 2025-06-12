@@ -1,4 +1,4 @@
-package su.uTa4u.VoxelRealms.engine.mesh;
+package su.uTa4u.VoxelRealms.graphics.mesh;
 
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;

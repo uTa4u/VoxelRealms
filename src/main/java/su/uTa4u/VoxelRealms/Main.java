@@ -1,9 +1,7 @@
 package su.uTa4u.VoxelRealms;
 
 import org.lwjgl.system.Configuration;
-import su.uTa4u.VoxelRealms.engine.Engine;
-import su.uTa4u.VoxelRealms.engine.mesh.NaiveMesher;
-import su.uTa4u.VoxelRealms.world.World;
+import su.uTa4u.VoxelRealms.logger.Logger;
 
 public final class Main {
     private static final String TITLE = "Voxel Realms";
@@ -14,6 +12,7 @@ public final class Main {
 
     public static final boolean WIREFRAME_MODE = false;
     public static final boolean DEBUG = false;
+    public static final boolean IS_IN_IDE = Boolean.getBoolean("isInIDE");
 
     public static void main(String[] args) {
         Configuration.STACK_SIZE.set(1024*8);

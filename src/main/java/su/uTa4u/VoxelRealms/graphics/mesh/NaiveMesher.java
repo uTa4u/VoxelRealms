@@ -1,10 +1,8 @@
-package su.uTa4u.VoxelRealms.engine.mesh;
+package su.uTa4u.VoxelRealms.graphics.mesh;
 
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 import su.uTa4u.VoxelRealms.world.Chunk;
 import su.uTa4u.VoxelRealms.world.Voxel;
-import su.uTa4u.VoxelRealms.world.VoxelMaterial;
 import su.uTa4u.VoxelRealms.world.World;
 
 import java.util.ArrayList;
