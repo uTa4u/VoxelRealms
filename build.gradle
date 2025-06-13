@@ -1,20 +1,6 @@
 plugins {
     id 'java'
-    id 'application'
     id 'idea'
-}
-
-jar {
-    manifest {
-        attributes(
-                'Main-Class': 'su.uTa4u.VoxelRealms.Main'
-        )
-    }
-}
-
-application {
-    mainClass = "su.uTa4u.VoxelRealms.Main"
-    applicationDefaultJvmArgs = ["-Xmx4096m", "-DisInIDE=true"]
 }
 
 idea {
@@ -28,21 +14,55 @@ repositories {
 }
 
 dependencies {
-    implementation ("it.unimi.dsi:fastutil-core:8.5.9")
-
     implementation platform("org.lwjgl:lwjgl-bom:${lwjglVersion}")
+    implementation("org.lwjgl:lwjgl")
+    implementation("org.lwjgl:lwjgl-glfw")
+    implementation("org.lwjgl:lwjgl-openal")
+    implementation("org.lwjgl:lwjgl-opengl")
+    runtimeOnly("org.lwjgl:lwjgl::${lwjglNatives}")
+    runtimeOnly("org.lwjgl:lwjgl-glfw::${lwjglNatives}")
+    runtimeOnly("org.lwjgl:lwjgl-openal::${lwjglNatives}")
+    runtimeOnly("org.lwjgl:lwjgl-opengl::${lwjglNatives}")
 
-    implementation ("org.lwjgl:lwjgl")
-//    implementation ("org.lwjgl:lwjgl-assimp")
-    implementation ("org.lwjgl:lwjgl-glfw")
-    implementation ("org.lwjgl:lwjgl-openal")
-    implementation ("org.lwjgl:lwjgl-opengl")
-//    implementation ("org.lwjgl:lwjgl-stb")
-    runtimeOnly ("org.lwjgl:lwjgl::${lwjglNatives}")
-//    runtimeOnly ("org.lwjgl:lwjgl-assimp::${lwjglNatives}")
-    runtimeOnly ("org.lwjgl:lwjgl-glfw::${lwjglNatives}")
-    runtimeOnly ("org.lwjgl:lwjgl-openal::${lwjglNatives}")
-    runtimeOnly ("org.lwjgl:lwjgl-opengl::${lwjglNatives}")
-//    runtimeOnly ("org.lwjgl:lwjgl-stb::${lwjglNatives}")
-    implementation ("org.joml:joml:${jomlVersion}")
+    implementation("it.unimi.dsi:fastutil-core:8.5.9")
+    implementation("org.joml:joml:${jomlVersion}")
+}
+
+def runDir = layout.projectDirectory.dir("run")
+def binDir = runDir.dir("bin")
+
+tasks.register("mkDirRun") {
+    group = "Execution"
+    description = "Creates a directory for launching the game in dev env"
+    mkdir(runDir)
+}
+
+tasks.register("copyBuiltJar", Copy) {
+    group = "Execution"
+    description = "Copies built jar file to the `run/bin/` directory"
+    mkdir(binDir)
+    from(jar)
+    into(binDir)
+}
+
+tasks.register("copyDependencies", Copy) {
+    group = "Execution"
+    description = "Copies runtime dependencies to the `run/bin/` directory"
+    from(sourceSets.main.runtimeClasspath.filter { File f -> f.name.endsWith(".jar") })
+    into(binDir)
+}
+
+tasks.register("run", JavaExec) {
+    dependsOn(["mkDirRun", "copyDependencies", "build", "copyBuiltJar"])
+    group = "Execution"
+    description = "Runs the game"
+    def cp = files()
+    cp.setFrom(binDir.asFileTree)
+    classpath = cp
+    workingDir = runDir
+    mainClass = "su.uTa4u.VoxelRealms.Main"
+    jvmArgs = [
+            "-Xmx4096m",
+            "-DisInIDE=true"
+    ]
 }

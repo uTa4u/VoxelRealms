@@ -42,6 +42,6 @@ bin/
 .DS_Store
 
 ### Custom ###
-/lib/
-renderdocdebug.cap
+/run
+rd_settings.cap
 /.idea
