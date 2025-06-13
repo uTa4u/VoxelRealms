@@ -4,6 +4,7 @@ import org.lwjgl.system.Configuration;
 import su.uTa4u.VoxelRealms.logger.Logger;
 
 public final class Main {
+    private static final Logger LOGGER = Logger.create();
     private static final String TITLE = "Voxel Realms";
     private static final int DEFAULT_WIDTH = 800;
     private static final int DEFAULT_HEIGHT = 600;
