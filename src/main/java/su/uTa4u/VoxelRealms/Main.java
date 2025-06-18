@@ -18,6 +18,10 @@ public final class Main {
     public static void main(String[] args) {
         Configuration.STACK_SIZE.set(1024*8);
 
+        LOGGER.error("error mesage");
+        LOGGER.debug("debug mesage");
+        LOGGER.warn("warn mesage");
+
         Engine engine = new Engine(TITLE, DEFAULT_WIDTH, DEFAULT_HEIGHT, TARGET_FPS, TARGET_TPS);
 
         engine.run();

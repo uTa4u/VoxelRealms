@@ -85,7 +85,6 @@ public final class Renderer {
 
         for (Mesh mesh : this.opaqueMeshes) {
             this.vertexArray.setData(mesh);
-//            this.shaderProgram.validate();
             glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
         }
 
@@ -93,7 +92,6 @@ public final class Renderer {
         glDepthMask(false);
         for (Mesh mesh : this.transparentMeshes) {
             this.vertexArray.setData(mesh);
-//            this.shaderProgram.validate();
             glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
         }
         glDepthMask(true);

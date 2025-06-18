@@ -1,5 +1,8 @@
 package su.uTa4u.VoxelRealms.world;
 
+import org.joml.Vector4f;
+import org.joml.Vector4fc;
+
 import java.util.Random;
 
 public final class VoxelMaterial {
@@ -21,12 +24,14 @@ public final class VoxelMaterial {
     public final float g;
     public final float b;
     public final float a;
+    public final Vector4fc vec;
 
     private VoxelMaterial(float r, float g, float b, float a) {
         this.r = r;
         this.g = g;
         this.b = b;
         this.a = a;
+        this.vec = new Vector4f(r, g, b, a);
     }
 
     private VoxelMaterial(int r, int g, int b, int a) {

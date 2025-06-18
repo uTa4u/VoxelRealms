@@ -3,6 +3,7 @@ package su.uTa4u.VoxelRealms.graphics;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -110,7 +111,7 @@ public final class Camera {
         delta.set(0.0f);
     }
 
-    public Vector3f getPosition() {
+    public Vector3fc getPosition() {
         return this.position;
     }
 }

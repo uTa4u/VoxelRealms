@@ -66,13 +66,13 @@ public final class Logger {
     private void log(String msg, String logLevel, String ansiColor) {
         final boolean supportAnsi = System.getenv().get("TERM") != null || Main.IS_IN_IDE;
         final String logMsg = String.format(
-                "[%s] [%s] [%s]: %s%n",
+                "[%s] [%s] [%s]: %s",
                 ZonedDateTime.now().format(MESSAGE_FORMATTER),
                 logLevel,
                 Thread.currentThread().getStackTrace()[3],
                 msg
         );
-        System.out.print((supportAnsi ? ansiColor : "") + logMsg + (supportAnsi ? "\u001B[0m" : ""));
-        WRITER.print(logMsg);
+        System.out.println((supportAnsi ? ansiColor : "") + logMsg + (supportAnsi ? "\u001B[0m" : ""));
+        WRITER.println(logMsg);
     }
 }

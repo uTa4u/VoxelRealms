@@ -1,200 +1,124 @@
 package su.uTa4u.VoxelRealms.graphics.mesh;
 
-import org.joml.Vector3f;
+import it.unimi.dsi.fastutil.floats.FloatArrayList;
+import it.unimi.dsi.fastutil.floats.FloatList;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import org.joml.*;
+import su.uTa4u.VoxelRealms.logger.Logger;
+import su.uTa4u.VoxelRealms.profiler.Profiler;
+import su.uTa4u.VoxelRealms.world.Direction;
 import su.uTa4u.VoxelRealms.world.Voxel;
-import su.uTa4u.VoxelRealms.world.VoxelMaterial;
 
 import java.util.*;
 import java.util.stream.IntStream;
 
 public final class Mesh {
-    private final int[] positions;
-    private final float[] colors;
-    private final int[] indices;
+    private static final int INDICES_PER_FACE = 6;
+    private static final EnumMap<Direction, IntList> FACE_POS_OFFSETS = new EnumMap<>(Direction.class);
 
-    private Mesh(int[] positions, float[] colors, int[] indices) {
-        this.positions = positions;
-        this.colors = colors;
-        this.indices = indices;
+    private final List<Vector3ic> positions;
+    private final Object2IntMap<Vector3ic> positionIndices;
+    private List<int[]> indices;
+    private final List<Vector4fc> colors;
+    private final FloatList camDistances;
+
+    public Mesh() {
+        this.positions = new ArrayList<>();
+        this.positionIndices = new Object2IntOpenHashMap<>();
+        this.indices = new ArrayList<>();
+        this.colors = new ArrayList<>();
+        this.camDistances = new FloatArrayList();
     }
 
-    public int getVertexCount() {
-        return this.indices.length;
+    void addFace(Direction dir, Voxel v, int x, int y, int z, Vector3fc camPos) {
+        final int missingIndex = this.positionIndices.defaultReturnValue();
+        IntList posOffsets = FACE_POS_OFFSETS.get(dir);
+        int[] indices = new int[4];
+        for (int i = 0; i < 4; i++) {
+            Vector4fc color = v.getMaterial().vec;
+            Vector3i vec = new Vector3i(
+                    x + posOffsets.getInt(0 + i * 3),
+                    y + posOffsets.getInt(1 + i * 3),
+                    z + posOffsets.getInt(2 + i * 3)
+            );
+            int index = this.positionIndices.getInt(vec);
+            if (index == missingIndex || this.colors.get(index) != color) {
+                int newIndex = this.positions.size();
+                this.positions.add(vec);
+                this.positionIndices.put(vec, newIndex);
+                this.colors.add(color);
+                indices[i] = newIndex;
+            } else {
+                indices[i] = index;
+            }
+        }
+        this.indices.add(new int[]{indices[0], indices[1], indices[3], indices[3], indices[1], indices[2]});
+
+        if (camPos != null) {
+            Vector3ic v0 = this.positions.get(indices[0]);
+            Vector3ic v2 = this.positions.get(indices[2]);
+            this.camDistances.add(camPos.distanceSquared(
+                    (v0.x() + v2.x()) / 2f,
+                    (v0.y() + v2.y()) / 2f,
+                    (v0.z() + v2.z()) / 2f
+            ));
+        }
+    }
+
+    void sort() {
+        if (this.indices.isEmpty()) return;
+        this.indices = IntStream.range(0, this.camDistances.size()).boxed()
+                .sorted(Comparator.comparingDouble(this.camDistances::getFloat).reversed())
+                .map(this.indices::get)
+                .toList();
     }
 
     public int[] getPositions() {
-        return this.positions;
-    }
-
-    public float[] getColors() {
-        return this.colors;
+        int[] ret = new int[this.positions.size() * 3];
+        for (int i = 0; i < this.positions.size(); i++) {
+            Vector3ic vec = this.positions.get(i);
+            ret[0 + i * 3] = vec.x();
+            ret[1 + i * 3] = vec.y();
+            ret[2 + i * 3] = vec.z();
+        }
+        return ret;
     }
 
     public int[] getIndices() {
-        return this.indices;
+        int[] ret = new int[this.indices.size() * INDICES_PER_FACE];
+        for (int i = 0; i < this.indices.size(); i++) {
+            System.arraycopy(this.indices.get(i), 0, ret, i * INDICES_PER_FACE, INDICES_PER_FACE);
+        }
+        return ret;
     }
 
-    static Builder builder() {
-        return new Builder();
+    public float[] getColors() {
+        float[] ret = new float[this.colors.size() * 4];
+        for (int i = 0; i < this.colors.size(); i++) {
+            Vector4fc vec = this.colors.get(i);
+            ret[0 + i * 4] = vec.x();
+            ret[1 + i * 4] = vec.y();
+            ret[2 + i * 4] = vec.z();
+            ret[3 + i * 4] = vec.w();
+        }
+        return ret;
     }
 
-    static class Builder {
-        private static final int VERTEX_COUNT = 8;
-        private static final int FACE_COUNT = 6;
-        private static final int POSITIONS_COUNT = VERTEX_COUNT * 3;
-        private static final int COLORS_COUNT = VERTEX_COUNT * 4;
-        private static final int INDICES_COUNT = FACE_COUNT * 6;
+    public int getVertexCount() {
+        return this.indices.size() * INDICES_PER_FACE;
+    }
 
-        private final List<Cube> cubes;
-
-        private Cube cube;
-
-        private Builder() {
-            this.cubes = new ArrayList<>();
-        }
-
-        void addVoxelData(Voxel v, int x, int y, int z, Vector3f camPos) {
-            this.cube = new Cube(v.getMaterial(), x, y, z, camPos);
-        }
-
-        void addXpFace() {
-            final int offset = 0;
-            this.cube.indices[offset + 0] = 5 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 1] = 7 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 2] = 4 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 3] = 4 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 4] = 7 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 5] = 6 + this.cubes.size() * VERTEX_COUNT;
-        }
-
-        void addXnFace() {
-            final int offset = 6;
-            this.cube.indices[offset + 0] = 1 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 1] = 3 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 2] = 0 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 3] = 0 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 4] = 3 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 5] = 2 + this.cubes.size() * VERTEX_COUNT;
-        }
-
-        void addYpFace() {
-            final int offset = 12;
-            this.cube.indices[offset + 0] = 3 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 1] = 2 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 2] = 7 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 3] = 7 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 4] = 2 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 5] = 6 + this.cubes.size() * VERTEX_COUNT;
-        }
-
-        void addYnFace() {
-            final int offset = 18;
-            this.cube.indices[offset + 0] = 1 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 1] = 0 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 2] = 5 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 3] = 5 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 4] = 0 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 5] = 4 + this.cubes.size() * VERTEX_COUNT;
-        }
-
-        void addZpFace() {
-            final int offset = 24;
-            this.cube.indices[offset + 0] = 1 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 1] = 3 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 2] = 5 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 3] = 5 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 4] = 3 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 5] = 7 + this.cubes.size() * VERTEX_COUNT;
-        }
-
-        void addZnFace() {
-            final int offset = 30;
-            this.cube.indices[offset + 0] = 0 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 1] = 2 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 2] = 4 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 3] = 4 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 4] = 2 + this.cubes.size() * VERTEX_COUNT;
-            this.cube.indices[offset + 5] = 6 + this.cubes.size() * VERTEX_COUNT;
-        }
-
-        void addCube() {
-            this.cubes.add(this.cube);
-        }
-
-        Mesh build(boolean isOpaque) {
-            final int cubeCount = this.cubes.size();
-            int[] positions = new int[cubeCount * POSITIONS_COUNT];
-            float[] colors = new float[cubeCount * COLORS_COUNT];
-            int[] indices = new int[cubeCount * INDICES_COUNT];
-            float[] distances = new float[cubeCount * FACE_COUNT];
-            int index = 0;
-            for (Cube c : this.cubes) {
-                System.arraycopy(c.positions, 0, positions, index * POSITIONS_COUNT, POSITIONS_COUNT);
-                System.arraycopy(c.colors, 0, colors, index * COLORS_COUNT, COLORS_COUNT);
-                System.arraycopy(c.indices, 0, indices, index * INDICES_COUNT, INDICES_COUNT);
-                System.arraycopy(c.distances, 0, distances, index * FACE_COUNT, FACE_COUNT);
-                index++;
-            }
-
-            int[] sortedIndices = new int[indices.length];
-            if (!isOpaque) {
-                int[] fromIndices = IntStream.range(0, cubeCount * FACE_COUNT).toArray();
-                int[] toIndices = Arrays.stream(fromIndices)
-                        .boxed()
-                        .sorted((i, j) -> Float.compare(distances[j], distances[i]))
-                        .mapToInt(v -> v)
-                        .toArray();
-                for (int i = 0; i < fromIndices.length; i++) {
-                    int from = fromIndices[i] * 6;
-                    int to = toIndices[i] * 6;
-                    System.arraycopy(indices, from, sortedIndices, to, 6);
-                }
-            } else {
-                sortedIndices = indices;
-            }
-            sortedIndices = Arrays.stream(sortedIndices).filter(v -> v != -1).toArray();
-//            sortedIndices = Arrays.stream(indices).filter(v -> v != -1).toArray();
-
-            return new Mesh(positions, colors, sortedIndices);
-        }
-
-        private static class Cube {
-            private final int[] positions;
-            private final float[] colors;
-            private final int[] indices;
-            private final float[] distances;
-
-            private Cube(VoxelMaterial m, int x, int y, int z, Vector3f camPos) {
-                this.positions = new int[]{
-                        x, y, z,
-                        x, y, z + 1,
-                        x, y + 1, z,
-                        x, y + 1, z + 1,
-                        x + 1, y, z,
-                        x + 1, y, z + 1,
-                        x + 1, y + 1, z,
-                        x + 1, y + 1, z + 1,
-                };
-                this.colors = new float[]{
-                        m.r, m.g, m.b, m.a,
-                        m.r, m.g, m.b, m.a,
-                        m.r, m.g, m.b, m.a,
-                        m.r, m.g, m.b, m.a,
-                        m.r, m.g, m.b, m.a,
-                        m.r, m.g, m.b, m.a,
-                        m.r, m.g, m.b, m.a,
-                        m.r, m.g, m.b, m.a,
-                };
-                this.indices = IntStream.generate(() -> -1).limit(INDICES_COUNT).toArray();
-                this.distances = new float[]{
-                        camPos.distanceSquared(x + 1.0f, y + 0.5f, z + 0.5f),
-                        camPos.distanceSquared(x + 0.0f, y + 0.5f, z + 0.5f),
-                        camPos.distanceSquared(x + 0.5f, y + 1.0f, z + 0.5f),
-                        camPos.distanceSquared(x + 0.5f, y + 0.0f, z + 0.5f),
-                        camPos.distanceSquared(x + 0.5f, y + 0.5f, z + 1.0f),
-                        camPos.distanceSquared(x + 0.5f, y + 0.5f, z + 0.0f),
-                };
-            }
-        }
+    static {
+        FACE_POS_OFFSETS.put(Direction.EAST, IntList.of(1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1));
+        FACE_POS_OFFSETS.put(Direction.WEST, IntList.of(0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0));
+        FACE_POS_OFFSETS.put(Direction.UP, IntList.of(0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0));
+        FACE_POS_OFFSETS.put(Direction.DOWN, IntList.of(0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1));
+        FACE_POS_OFFSETS.put(Direction.NORTH, IntList.of(0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0));
+        FACE_POS_OFFSETS.put(Direction.SOUTH, IntList.of(0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1));
     }
 }

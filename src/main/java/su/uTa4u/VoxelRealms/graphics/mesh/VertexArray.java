@@ -35,15 +35,15 @@ public final class VertexArray {
     public void setData(Mesh mesh) {
         // Position
         glBindBuffer(GL_ARRAY_BUFFER, this.positionVboId);
-        glBufferData(GL_ARRAY_BUFFER, mesh.getPositions(), GL_STREAM_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, mesh.getPositions(), GL_STATIC_DRAW);
 
         // Color
         glBindBuffer(GL_ARRAY_BUFFER, this.colorVboId);
-        glBufferData(GL_ARRAY_BUFFER, mesh.getColors(), GL_STREAM_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, mesh.getColors(), GL_STATIC_DRAW);
 
         // Index
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this.eboId);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.getIndices(), GL_STREAM_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.getIndices(), GL_STATIC_DRAW);
     }
 
     public void bind() {
